@@ -1,0 +1,52 @@
+@import "tailwindcss";
+
+@layer base {
+  body {
+    font-family: 'Plus Jakarta Sans', 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  }
+}
+
+/* Custom Animations and Scrollbar styles */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+@keyframes pulse-glow {
+  0%, 100% {
+    box-shadow: 0 0 15px rgba(114, 223, 208, 0.6);
+  }
+  50% {
+    box-shadow: 0 0 25px rgba(114, 223, 208, 0.9), 0 0 10px rgba(212, 249, 51, 0.6);
+  }
+}
+
+.animate-pulse-glow {
+  animation: pulse-glow 2.5s infinite ease-in-out;
+}
+
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-4px);
+  }
+}
+
+.animate-float {
+  animation: float 3s infinite ease-in-out;
+}
+
+/* Wondr Tosca theme variables */
+:root {
+  --wondr-teal: #72DFD0;
+  --wondr-teal-dark: #00A396;
+  --wondr-teal-light: #E6FBF8;
+  --bni-orange: #F37021;
+  --bni-orange-dark: #D85A10;
+  --neon-lemon: #D4F933;
+}

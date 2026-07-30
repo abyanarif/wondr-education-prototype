@@ -1,0 +1,1146 @@
+import React, { useState } from 'react';
+import {
+  Bell,
+  Bookmark,
+  Grid,
+  LogOut,
+  Eye,
+  EyeOff,
+  Copy,
+  Plus,
+  Send,
+  CreditCard,
+  Receipt,
+  Wallet,
+  GraduationCap,
+  QrCode,
+  ArrowLeft,
+  ChevronDown,
+  CheckCircle2,
+  RefreshCw,
+  Sliders,
+  ShieldCheck,
+  Sparkles,
+  Check,
+  X,
+  ChevronRight,
+  TrendingUp,
+  Download,
+  Share2,
+  Utensils,
+  Gamepad2,
+  Bus,
+  School,
+  Store,
+  Building2,
+  Smartphone,
+  ArrowRightLeft
+} from 'lucide-react';
+
+import { initialStudentsData } from './dummyData';
+import MerchantKantin from './components/MerchantKantin';
+import SchoolTreasury from './components/SchoolTreasury';
+
+export default function App() {
+  // Global Shared State for Students Data
+  const [studentsData, setStudentsData] = useState(initialStudentsData);
+  const [selectedStudentId, setSelectedStudentId] = useState('akbar');
+
+  // Top Level Mode: 'parent' (Screen 1 & 2) | 'merchant' (Screen 3 POS) | 'treasury' (Screen 4 B2B Portal)
+  const [appMode, setAppMode] = useState('parent');
+
+  // Screen inside Parent Mode: 'home' (Screen 1) | 'education' (Screen 2)
+  const [currentScreen, setCurrentScreen] = useState('home');
+  const [activeTab, setActiveTab] = useState('transaksi');
+  const [showBalance, setShowBalance] = useState(true);
+
+  // Live Toast & Push Notification System
+  const [toastMessage, setToastMessage] = useState(null);
+  const [pushNotification, setPushNotification] = useState(null);
+
+  // Modals state
+  const [showReceiptModal, setShowReceiptModal] = useState(false);
+  const [showKprModal, setShowKprModal] = useState(false);
+  const [showNotificationDrawer, setShowNotificationDrawer] = useState(false);
+  const [showStudentSelectorSheet, setShowStudentSelectorSheet] = useState(false);
+
+  // Current active student object
+  const student = studentsData[selectedStudentId] || studentsData.akbar;
+
+  // Trigger Toast Notification
+  const triggerToast = (msg) => {
+    setToastMessage(msg);
+    setTimeout(() => setToastMessage(null), 3500);
+  };
+
+  // Trigger Push Notification Banner (Top of Screen)
+  const triggerPushNotification = (msg) => {
+    setPushNotification(msg);
+    setTimeout(() => setPushNotification(null), 5000);
+  };
+
+  // Handle slider change for daily allowance limit in Screen 2
+  const handleLimitChange = (e) => {
+    const newLimit = parseInt(e.target.value, 10);
+    setStudentsData((prev) => ({
+      ...prev,
+      [selectedStudentId]: {
+        ...prev[selectedStudentId],
+        dailyLimit: newLimit
+      }
+    }));
+  };
+
+  // Handle category locker toggle in Screen 2
+  const toggleCategory = (catKey, catName) => {
+    const currentVal = student.categories[catKey];
+    const updatedVal = !currentVal;
+
+    setStudentsData((prev) => ({
+      ...prev,
+      [selectedStudentId]: {
+        ...prev[selectedStudentId],
+        categories: {
+          ...prev[selectedStudentId].categories,
+          [catKey]: updatedVal
+        }
+      }
+    }));
+
+    const statusText = updatedVal ? 'Diizinkan / Aktif' : 'Diblokir';
+    triggerToast(`Akses ${catName} untuk ${student.name} kini ${statusText}`);
+  };
+
+  // Handle Transaction Processed by Merchant POS (Screen 3 Engine)
+  const handleProcessTransaction = ({ studentId, amount, itemSummary, cartItems }) => {
+    const targetStudent = studentsData[studentId];
+    const newSpent = targetStudent.spentToday + amount;
+    const nowTime = new Date().toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' }) + ' WIB';
+
+    const newHistoryRecord = {
+      id: Date.now(),
+      title: itemSummary,
+      time: nowTime,
+      price: amount,
+      category: cartItems[0]?.category || 'kantin',
+      status: 'Berhasil'
+    };
+
+    setStudentsData((prev) => ({
+      ...prev,
+      [studentId]: {
+        ...prev[studentId],
+        spentToday: newSpent,
+        canteenHistory: [newHistoryRecord, ...prev[studentId].canteenHistory]
+      }
+    }));
+
+    // Trigger push notification banner visible across modes
+    triggerPushNotification(`🔔 Transaksi Kantin: ${targetStudent.name} baru saja membeli ${itemSummary} (Rp ${amount.toLocaleString('id-ID')})`);
+  };
+
+  // Copy Account Number
+  const handleCopyAccount = () => {
+    navigator.clipboard?.writeText('0223383830');
+    triggerToast('Nomor rekening 0223383830 disalin!');
+  };
+
+  return (
+    <div className="min-h-screen bg-slate-900 flex flex-col items-center justify-center p-0 md:p-6 text-slate-800 selection:bg-[#72DFD0]">
+      
+      {/* Top Desktop Navigation & App Mode Switcher */}
+      <div className="w-full max-w-[1200px] mb-4 px-4 hidden md:flex items-center justify-between">
+        <div className="flex items-center gap-3">
+          <div className="bg-[#72DFD0] text-slate-900 p-2.5 rounded-2xl font-bold flex items-center justify-center shadow-lg shadow-[#72DFD0]/20">
+            <GraduationCap className="w-6 h-6 text-slate-900" />
+          </div>
+          <div>
+            <div className="flex items-center gap-2">
+              <h1 className="text-white text-xl font-extrabold tracking-tight">wondr for Education</h1>
+              <span className="bg-[#D4F933] text-slate-950 font-bold text-[10px] px-2 py-0.5 rounded-full uppercase tracking-wider">Ecosystem v3.0</span>
+            </div>
+            <p className="text-slate-400 text-xs font-medium">Platform Keuangan Sekolah, POS Kantin & Portal Bendahara B2B BNI Open API</p>
+          </div>
+        </div>
+
+        {/* MODE SWITCHER BUTTONS (4 Screens Access) */}
+        <div className="flex items-center gap-1.5 bg-slate-800/90 backdrop-blur-md p-1.5 rounded-2xl border border-slate-700/60 shadow-xl">
+          <button
+            onClick={() => { setAppMode('parent'); setCurrentScreen('home'); }}
+            className={`px-3 py-1.5 rounded-xl font-bold text-xs transition-all flex items-center gap-1.5 ${
+              appMode === 'parent' && currentScreen === 'home'
+                ? 'bg-[#72DFD0] text-slate-950 shadow-md'
+                : 'text-slate-300 hover:text-white'
+            }`}
+          >
+            <Smartphone className="w-3.5 h-3.5" />
+            Screen 1: Home
+          </button>
+
+          <button
+            onClick={() => { setAppMode('parent'); setCurrentScreen('education'); }}
+            className={`px-3 py-1.5 rounded-xl font-bold text-xs transition-all flex items-center gap-1.5 ${
+              appMode === 'parent' && currentScreen === 'education'
+                ? 'bg-[#72DFD0] text-slate-950 shadow-md'
+                : 'text-slate-300 hover:text-white'
+            }`}
+          >
+            <GraduationCap className="w-3.5 h-3.5" />
+            Screen 2: Parent Hub
+          </button>
+
+          <button
+            onClick={() => setAppMode('merchant')}
+            className={`px-3 py-1.5 rounded-xl font-extrabold text-xs transition-all flex items-center gap-1.5 ${
+              appMode === 'merchant'
+                ? 'bg-gradient-to-r from-[#FF7A00] to-[#F37021] text-white shadow-lg shadow-[#F37021]/30'
+                : 'text-slate-300 hover:text-white'
+            }`}
+          >
+            <Store className="w-3.5 h-3.5 text-amber-300" />
+            Screen 3: POS Kantin
+          </button>
+
+          <button
+            onClick={() => setAppMode('treasury')}
+            className={`px-3 py-1.5 rounded-xl font-extrabold text-xs transition-all flex items-center gap-1.5 ${
+              appMode === 'treasury'
+                ? 'bg-[#005E6A] text-white shadow-lg shadow-[#005E6A]/40 ring-1 ring-teal-400'
+                : 'text-slate-300 hover:text-white'
+            }`}
+          >
+            <Building2 className="w-3.5 h-3.5 text-[#72DFD0]" />
+            Screen 4: Portal Sekolah B2B
+          </button>
+        </div>
+      </div>
+
+      {/* Main Desktop Grid Wrapper */}
+      <div className="w-full max-w-[1200px] grid grid-cols-1 md:grid-cols-12 gap-8 items-start">
+        
+        {/* Left Side Panel: Interactive Guide & Live Demo Monitor */}
+        <div className="hidden md:block md:col-span-4 lg:col-span-4 space-y-4">
+          <div className="bg-slate-800/60 backdrop-blur-xl border border-slate-700/60 p-5 rounded-3xl text-slate-200 shadow-xl space-y-4">
+            <div className="flex items-center justify-between">
+              <h2 className="text-white font-bold text-base flex items-center gap-2">
+                <Sparkles className="w-5 h-5 text-[#D4F933]" />
+                Modul Ekosistem wondr
+              </h2>
+              <span className="text-[10px] bg-slate-700 text-[#72DFD0] px-2 py-0.5 rounded-full font-mono">
+                BNI Open API
+              </span>
+            </div>
+
+            <p className="text-xs text-slate-300 leading-relaxed">
+              Ekosistem terintegrasi menghubungkan Aplikasi Orang Tua, Mesin Kasir Kantin, dan Portal Keuangan Bendahara Sekolah:
+            </p>
+
+            <div className="space-y-2 text-xs">
+              <button
+                onClick={() => { setAppMode('parent'); setCurrentScreen('home'); }}
+                className={`w-full p-2.5 rounded-2xl border text-left flex items-center justify-between transition-all ${
+                  appMode === 'parent' && currentScreen === 'home' ? 'bg-[#72DFD0]/10 border-[#72DFD0] text-white' : 'bg-slate-900/40 border-slate-700 text-slate-400'
+                }`}
+              >
+                <div className="flex items-center gap-2.5">
+                  <Smartphone className="w-4 h-4 text-[#72DFD0]" />
+                  <span>1. wondr Mobile App</span>
+                </div>
+                <ChevronRight className="w-4 h-4" />
+              </button>
+
+              <button
+                onClick={() => { setAppMode('parent'); setCurrentScreen('education'); }}
+                className={`w-full p-2.5 rounded-2xl border text-left flex items-center justify-between transition-all ${
+                  appMode === 'parent' && currentScreen === 'education' ? 'bg-[#72DFD0]/10 border-[#72DFD0] text-white' : 'bg-slate-900/40 border-slate-700 text-slate-400'
+                }`}
+              >
+                <div className="flex items-center gap-2.5">
+                  <GraduationCap className="w-4 h-4 text-[#D4F933]" />
+                  <span>2. Parent Control Hub</span>
+                </div>
+                <ChevronRight className="w-4 h-4" />
+              </button>
+
+              <button
+                onClick={() => setAppMode('merchant')}
+                className={`w-full p-2.5 rounded-2xl border text-left flex items-center justify-between transition-all ${
+                  appMode === 'merchant' ? 'bg-[#F37021]/10 border-[#F37021] text-white' : 'bg-slate-900/40 border-slate-700 text-slate-400'
+                }`}
+              >
+                <div className="flex items-center gap-2.5">
+                  <Store className="w-4 h-4 text-amber-400" />
+                  <span>3. Canteen Merchant POS</span>
+                </div>
+                <ChevronRight className="w-4 h-4" />
+              </button>
+
+              <button
+                onClick={() => setAppMode('treasury')}
+                className={`w-full p-2.5 rounded-2xl border text-left flex items-center justify-between transition-all ${
+                  appMode === 'treasury' ? 'bg-teal-500/10 border-teal-400 text-white' : 'bg-slate-900/40 border-slate-700 text-slate-400'
+                }`}
+              >
+                <div className="flex items-center gap-2.5">
+                  <Building2 className="w-4 h-4 text-teal-400" />
+                  <span>4. Portal Bendahara (B2B)</span>
+                </div>
+                <ChevronRight className="w-4 h-4" />
+              </button>
+            </div>
+          </div>
+
+          {/* Quick Profile Switcher Card */}
+          <div className="bg-slate-800/60 backdrop-blur-xl border border-slate-700/60 p-4 rounded-3xl text-slate-200">
+            <span className="text-[11px] font-semibold uppercase tracking-wider text-slate-400 block mb-2">Simulasi Profil Siswa</span>
+            <div className="grid grid-cols-2 gap-2">
+              <button
+                onClick={() => { setSelectedStudentId('akbar'); triggerToast('Profil aktif: Akbar (SMA 1 Surabaya)'); }}
+                className={`p-2.5 rounded-2xl text-left border transition-all flex items-center gap-2.5 ${
+                  selectedStudentId === 'akbar'
+                    ? 'bg-[#72DFD0]/10 border-[#72DFD0] text-white'
+                    : 'bg-slate-900/40 border-slate-700 text-slate-400 hover:text-slate-200'
+                }`}
+              >
+                <img src={studentsData.akbar.avatar} alt="Akbar" className="w-8 h-8 rounded-full border border-emerald-400" />
+                <div className="overflow-hidden">
+                  <p className="font-bold text-xs truncate">Akbar</p>
+                  <p className="text-[10px] text-slate-400 truncate">SMA 1 Surabaya</p>
+                </div>
+              </button>
+
+              <button
+                onClick={() => { setSelectedStudentId('aisha'); triggerToast('Profil aktif: Aisha (SMP 2 Surabaya)'); }}
+                className={`p-2.5 rounded-2xl text-left border transition-all flex items-center gap-2.5 ${
+                  selectedStudentId === 'aisha'
+                    ? 'bg-[#72DFD0]/10 border-[#72DFD0] text-white'
+                    : 'bg-slate-900/40 border-slate-700 text-slate-400 hover:text-slate-200'
+                }`}
+              >
+                <img src={studentsData.aisha.avatar} alt="Aisha" className="w-8 h-8 rounded-full border border-purple-400" />
+                <div className="overflow-hidden">
+                  <p className="font-bold text-xs truncate">Aisha</p>
+                  <p className="text-[10px] text-slate-400 truncate">SMP 2 Surabaya</p>
+                </div>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        {/* Center: Smartphone / Frame Container */}
+        <div className="col-span-1 md:col-span-8 lg:col-span-8 flex justify-center">
+          
+          {/* Main App Frame (max-width: 412px) */}
+          <div className="w-full max-w-[412px] bg-[#F8FAFC] min-h-[850px] max-h-[92vh] rounded-[48px] border-[8px] border-slate-950 shadow-[0_25px_60px_-15px_rgba(0,0,0,0.7)] flex flex-col relative overflow-hidden ring-1 ring-slate-800 select-none">
+            
+            {/* Top Status Bar & Dynamic Island */}
+            <div className="bg-[#F8FAFC] pt-3 px-6 pb-2 flex items-center justify-between text-xs font-semibold text-slate-900 shrink-0 z-30 relative">
+              <span>09:41</span>
+              
+              {/* Dynamic Island Notch */}
+              <div className="w-24 h-4 bg-slate-950 rounded-full absolute left-1/2 -translate-x-1/2 top-2.5 flex items-center justify-end px-2">
+                <div className="w-2 h-2 rounded-full bg-slate-900 border border-slate-800"></div>
+              </div>
+
+              <div className="flex items-center gap-1.5 text-slate-900">
+                <span className="text-[10px] font-extrabold tracking-tighter">5G</span>
+                <div className="w-5 h-2.5 border border-slate-900 rounded-xs p-0.5 flex items-center">
+                  <div className="h-full w-full bg-slate-900 rounded-2xs"></div>
+                </div>
+              </div>
+            </div>
+
+            {/* Mobile App Mode Switcher Header Pill */}
+            <div className="bg-slate-900 px-4 py-2 flex items-center justify-between text-xs border-b border-slate-800 shrink-0 z-30">
+              <div className="flex items-center gap-1.5 text-white font-bold">
+                {appMode === 'parent' && <><Smartphone className="w-3.5 h-3.5 text-[#72DFD0]" /> Mode Orang Tua</>}
+                {appMode === 'merchant' && <><Store className="w-3.5 h-3.5 text-amber-400" /> Mode Kasir POS</>}
+                {appMode === 'treasury' && <><Building2 className="w-3.5 h-3.5 text-teal-400" /> Portal Sekolah B2B</>}
+              </div>
+
+              <button
+                onClick={() => {
+                  if (appMode === 'parent') setAppMode('merchant');
+                  else if (appMode === 'merchant') setAppMode('treasury');
+                  else { setAppMode('parent'); setCurrentScreen('education'); }
+                }}
+                className="bg-slate-800 hover:bg-slate-700 text-[#72DFD0] px-2.5 py-1 rounded-xl text-[10px] font-extrabold flex items-center gap-1 border border-slate-700 transition-colors"
+              >
+                <ArrowRightLeft className="w-3 h-3" /> Ganti Mode
+              </button>
+            </div>
+
+            {/* PUSH NOTIFICATION BANNER */}
+            {pushNotification && (
+              <div className="absolute top-14 left-3 right-3 bg-slate-900/95 text-white text-xs font-semibold p-3 rounded-2xl shadow-2xl z-50 border border-emerald-500/50 animate-in slide-in-from-top-4 duration-300 flex items-start gap-2.5">
+                <div className="w-7 h-7 rounded-xl bg-emerald-500 text-slate-950 flex items-center justify-center shrink-0 font-bold mt-0.5">
+                  <Utensils className="w-4 h-4" />
+                </div>
+                <div className="flex-1 pr-2">
+                  <p className="text-[10px] text-[#72DFD0] font-bold">Notifikasi Transaksi Real-Time</p>
+                  <p className="text-[11px] leading-snug mt-0.5">{pushNotification}</p>
+                </div>
+                <button onClick={() => setPushNotification(null)} className="text-slate-400 hover:text-white">
+                  <X className="w-3.5 h-3.5" />
+                </button>
+              </div>
+            )}
+
+            {/* TOAST ALERT OVERLAY */}
+            {toastMessage && (
+              <div className="absolute top-14 left-4 right-4 bg-slate-900/95 text-white text-xs font-medium py-3 px-4 rounded-2xl shadow-2xl z-50 flex items-center justify-between border border-slate-700 animate-in fade-in duration-300">
+                <div className="flex items-center gap-2">
+                  <div className="w-2 h-2 rounded-full bg-[#72DFD0] animate-ping"></div>
+                  <span>{toastMessage}</span>
+                </div>
+                <button onClick={() => setToastMessage(null)} className="text-slate-400 hover:text-white">
+                  <X className="w-3.5 h-3.5" />
+                </button>
+              </div>
+            )}
+
+            {/* MAIN APP BODY CONTENT */}
+            <div className="flex-1 overflow-y-auto no-scrollbar relative flex flex-col">
+              
+              {/* SCREEN 4: SCHOOL TREASURY B2B PORTAL */}
+              {appMode === 'treasury' && (
+                <SchoolTreasury onTriggerNotification={triggerPushNotification} />
+              )}
+
+              {/* SCREEN 3: KASIR KANTIN POS ENGINE */}
+              {appMode === 'merchant' && (
+                <MerchantKantin
+                  studentsData={studentsData}
+                  selectedStudentId={selectedStudentId}
+                  onSelectStudent={(id) => setSelectedStudentId(id)}
+                  onProcessTransaction={handleProcessTransaction}
+                  onTriggerNotification={triggerPushNotification}
+                />
+              )}
+
+              {/* SCREEN 1 & SCREEN 2: PARENT WONDR APP */}
+              {appMode === 'parent' && (
+                <>
+                  {/* SCREEN 1: WONDR HOME PAGE */}
+                  {currentScreen === 'home' && (
+                    <div className="p-4 space-y-4 pb-24 animate-in fade-in duration-300">
+                      
+                      {/* Top Header */}
+                      <div className="space-y-3">
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center gap-3">
+                            <img
+                              src="https://i.pravatar.cc/150?img=32"
+                              alt="Karnisa"
+                              className="w-10 h-10 rounded-full object-cover border-2 border-white shadow-xs"
+                            />
+                            <div>
+                              <p className="text-[11px] text-slate-500 font-medium">Selamat Pagi,</p>
+                              <h2 className="text-slate-900 font-extrabold text-base tracking-tight leading-tight">Hai, Karnisa!</h2>
+                            </div>
+                          </div>
+
+                          <div className="flex items-center gap-1.5 text-slate-700">
+                            <button
+                              onClick={() => setShowNotificationDrawer(true)}
+                              className="w-8 h-8 rounded-full bg-white hover:bg-slate-100 flex items-center justify-center relative shadow-xs border border-slate-100 text-slate-700"
+                            >
+                              <Bell className="w-4 h-4" />
+                              <span className="w-2 h-2 bg-red-500 rounded-full absolute top-1.5 right-1.5 ring-2 ring-white"></span>
+                            </button>
+
+                            <button className="w-8 h-8 rounded-full bg-white hover:bg-slate-100 flex items-center justify-center shadow-xs border border-slate-100 text-slate-700">
+                              <Bookmark className="w-4 h-4" />
+                            </button>
+
+                            <button className="w-8 h-8 rounded-full bg-white hover:bg-slate-100 flex items-center justify-center shadow-xs border border-slate-100 text-slate-700">
+                              <Grid className="w-4 h-4" />
+                            </button>
+
+                            <button className="w-8 h-8 rounded-full bg-white hover:bg-slate-100 flex items-center justify-center shadow-xs border border-slate-100 text-red-500">
+                              <LogOut className="w-4 h-4" />
+                            </button>
+                          </div>
+                        </div>
+
+                        {/* 3 Pill Tabs */}
+                        <div className="flex items-center bg-slate-200/70 p-1 rounded-full text-xs font-bold text-slate-600">
+                          <button
+                            onClick={() => setActiveTab('insights')}
+                            className={`flex-1 py-1.5 text-center rounded-full transition-all ${
+                              activeTab === 'insights' ? 'bg-[#D4F933] text-slate-950 shadow-xs' : 'hover:text-slate-900'
+                            }`}
+                          >
+                            Insights
+                          </button>
+                          <button
+                            onClick={() => setActiveTab('transaksi')}
+                            className={`flex-1 py-1.5 text-center rounded-full transition-all ${
+                              activeTab === 'transaksi' ? 'bg-[#D4F933] text-slate-950 shadow-xs' : 'hover:text-slate-900'
+                            }`}
+                          >
+                            Transaksi
+                          </button>
+                          <button
+                            onClick={() => setActiveTab('growth')}
+                            className={`flex-1 py-1.5 text-center rounded-full transition-all ${
+                              activeTab === 'growth' ? 'bg-[#D4F933] text-slate-950 shadow-xs' : 'hover:text-slate-900'
+                            }`}
+                          >
+                            Growth
+                          </button>
+                        </div>
+                      </div>
+
+                      {/* BNI Taplus Main Card */}
+                      <div className="bg-gradient-to-br from-[#FF7A00] via-[#F37021] to-[#D85A10] p-5 rounded-3xl text-white shadow-xl shadow-[#F37021]/25 relative overflow-hidden border border-orange-400/30">
+                        <div className="absolute right-4 top-4 opacity-90">
+                          <img src="/assets/bni-logo.png" alt="BNI Logo" className="h-6 object-contain bg-white/10 px-2 py-0.5 rounded-md backdrop-blur-xs" />
+                        </div>
+
+                        <div className="space-y-4">
+                          <div>
+                            <span className="text-[10px] tracking-wider uppercase bg-black/20 text-orange-100 font-semibold px-2 py-0.5 rounded-full border border-white/10">
+                              Utama
+                            </span>
+                            <h3 className="font-extrabold text-base tracking-wide mt-1">BNI Taplus</h3>
+                          </div>
+
+                          <div>
+                            <div className="flex items-center gap-2 text-orange-100 text-xs font-medium">
+                              <span>Total Saldo</span>
+                              <button onClick={() => setShowBalance(!showBalance)} className="hover:text-white">
+                                {showBalance ? <Eye className="w-3.5 h-3.5" /> : <EyeOff className="w-3.5 h-3.5" />}
+                              </button>
+                            </div>
+                            <p className="text-2xl font-black tracking-tight mt-0.5">
+                              {showBalance ? 'Rp2.800.000.000' : '••••••••••••'}
+                            </p>
+                          </div>
+
+                          <div className="flex items-center justify-between pt-2 border-t border-white/20 text-xs">
+                            <div className="flex items-center gap-1.5 bg-black/20 px-2.5 py-1 rounded-xl">
+                              <span className="font-mono text-slate-100 font-semibold">0223383830</span>
+                              <button onClick={handleCopyAccount} className="hover:text-amber-200">
+                                <Copy className="w-3.5 h-3.5" />
+                              </button>
+                            </div>
+                            <button className="bg-white/20 hover:bg-white/30 text-white px-3 py-1 rounded-xl font-bold text-[11px]">
+                              + Top Up
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Grid Menu "Fitur pilihan kamu" */}
+                      <div className="bg-white p-4 rounded-3xl border border-slate-100 shadow-xs space-y-3">
+                        <div className="flex items-center justify-between">
+                          <h3 className="font-bold text-slate-900 text-sm">Fitur pilihan kamu</h3>
+                          <button className="text-xs text-[#00A396] font-semibold hover:underline">Kelola</button>
+                        </div>
+
+                        <div className="grid grid-cols-3 gap-3 pt-1">
+                          <button className="flex flex-col items-center gap-2 group">
+                            <div className="w-13 h-13 rounded-2xl bg-[#E6FBF8] text-[#00A396] flex items-center justify-center shadow-xs">
+                              <Send className="w-6 h-6" />
+                            </div>
+                            <span className="text-xs font-semibold text-slate-700">Transfer</span>
+                          </button>
+
+                          <button className="flex flex-col items-center gap-2 group">
+                            <div className="w-13 h-13 rounded-2xl bg-[#E6FBF8] text-[#00A396] flex items-center justify-center shadow-xs">
+                              <CreditCard className="w-6 h-6" />
+                            </div>
+                            <span className="text-xs font-semibold text-slate-700">Tapcash</span>
+                          </button>
+
+                          <button className="flex flex-col items-center gap-2 group">
+                            <div className="w-13 h-13 rounded-2xl bg-[#E6FBF8] text-[#00A396] flex items-center justify-center shadow-xs">
+                              <Receipt className="w-6 h-6" />
+                            </div>
+                            <span className="text-xs font-semibold text-slate-700">Bayar & Beli</span>
+                          </button>
+
+                          <button className="flex flex-col items-center gap-2 group">
+                            <div className="w-13 h-13 rounded-2xl bg-[#E6FBF8] text-[#00A396] flex items-center justify-center shadow-xs">
+                              <Wallet className="w-6 h-6" />
+                            </div>
+                            <span className="text-xs font-semibold text-slate-700">E-Wallet</span>
+                          </button>
+
+                          {/* 5. Edukasi & Anak */}
+                          <button
+                            onClick={() => setCurrentScreen('education')}
+                            className="flex flex-col items-center gap-2 group relative"
+                          >
+                            <div className="w-13 h-13 rounded-2xl bg-gradient-to-br from-[#72DFD0] to-[#00B4A2] text-slate-950 flex items-center justify-center shadow-md shadow-[#72DFD0]/40 border-2 border-white animate-pulse-glow">
+                              <GraduationCap className="w-7 h-7 text-slate-950" />
+                              <span className="absolute -top-2 -right-1 bg-[#D4F933] text-slate-950 font-black text-[9px] px-1.5 py-0.5 rounded-full uppercase border border-slate-900">
+                                BARU
+                              </span>
+                            </div>
+                            <span className="text-xs font-bold text-slate-900">Edukasi & Anak</span>
+                          </button>
+
+                          <button className="flex flex-col items-center gap-2 group">
+                            <div className="w-13 h-13 rounded-2xl bg-[#E6FBF8] text-[#00A396] flex items-center justify-center shadow-xs">
+                              <QrCode className="w-6 h-6" />
+                            </div>
+                            <span className="text-xs font-semibold text-slate-700">Virtual Account</span>
+                          </button>
+                        </div>
+                      </div>
+
+                      {/* Promo Hub Banner */}
+                      <div
+                        onClick={() => setCurrentScreen('education')}
+                        className="bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900 p-4 rounded-3xl text-white shadow-md cursor-pointer hover:border-[#72DFD0]/50 border border-slate-800 transition-all flex items-center justify-between"
+                      >
+                        <div className="flex items-center gap-3">
+                          <div className="w-10 h-10 rounded-2xl bg-[#72DFD0] text-slate-950 flex items-center justify-center shrink-0">
+                            <School className="w-5 h-5" />
+                          </div>
+                          <div>
+                            <div className="flex items-center gap-2">
+                              <span className="text-white font-bold text-xs">wondr Education Hub</span>
+                              <span className="text-[10px] bg-[#D4F933] text-slate-950 font-bold px-1.5 rounded">Baru</span>
+                            </div>
+                            <p className="text-[11px] text-slate-300 mt-0.5">SPP Lunas & Sisa Pagu {student.name}: Rp {(student.dailyLimit - student.spentToday).toLocaleString('id-ID')}</p>
+                          </div>
+                        </div>
+                        <ChevronRight className="w-5 h-5 text-slate-400" />
+                      </div>
+
+                      {/* Transaksi Terakhir List */}
+                      <div className="bg-white p-4 rounded-3xl border border-slate-100 shadow-xs space-y-3">
+                        <div className="flex items-center justify-between">
+                          <h3 className="font-bold text-slate-900 text-sm">Transaksi Terakhir</h3>
+                          <button className="text-xs text-[#00A396] font-semibold hover:underline">Lihat Semua</button>
+                        </div>
+
+                        <div className="space-y-2">
+                          {student.canteenHistory.slice(0, 3).map((item) => (
+                            <div key={item.id} className="flex items-center justify-between p-2.5 rounded-2xl bg-slate-50 border border-slate-100 text-xs">
+                              <div className="flex items-center gap-3">
+                                <div className={`w-9 h-9 rounded-xl flex items-center justify-center ${item.category === 'game' ? 'bg-rose-100 text-rose-600' : 'bg-teal-100 text-[#00A396]'}`}>
+                                  {item.category === 'game' ? <Gamepad2 className="w-5 h-5" /> : <Utensils className="w-5 h-5" />}
+                                </div>
+                                <div>
+                                  <p className="font-bold text-slate-900">{item.title}</p>
+                                  <p className="text-[10px] text-slate-500">{item.time} • QRIS BNI Junior</p>
+                                </div>
+                              </div>
+                              <span className="font-bold text-slate-900">-Rp {item.price.toLocaleString('id-ID')}</span>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+
+                    </div>
+                  )}
+
+                  {/* SCREEN 2: PARENT CONTROL HUB */}
+                  {currentScreen === 'education' && (
+                    <div className="p-4 space-y-4 pb-24 animate-in fade-in duration-300">
+                      
+                      {/* Screen Header */}
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-2">
+                          <button
+                            onClick={() => setCurrentScreen('home')}
+                            className="w-9 h-9 rounded-full bg-white hover:bg-slate-100 flex items-center justify-center text-slate-800 shadow-xs border border-slate-100"
+                          >
+                            <ArrowLeft className="w-5 h-5" />
+                          </button>
+                          <div>
+                            <div className="flex items-center gap-1.5">
+                              <h2 className="text-slate-900 font-extrabold text-base">wondr for Education</h2>
+                              <img src="/assets/wondr-logo.png" alt="wondr logo" className="h-3.5 object-contain" />
+                            </div>
+                            <p className="text-[10px] text-slate-500 font-semibold">Hub Kontrol Orang Tua & Keuangan Sekolah</p>
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Student Selector Card */}
+                      <div className="bg-white p-3.5 rounded-3xl border border-slate-200/80 shadow-xs flex items-center justify-between">
+                        <div className="flex items-center gap-3">
+                          <img
+                            src={student.avatar}
+                            alt={student.name}
+                            className="w-11 h-11 rounded-full object-cover border-2 border-[#72DFD0] shadow-xs"
+                          />
+                          <div>
+                            <div className="flex items-center gap-1.5">
+                              <h3 className="font-extrabold text-slate-900 text-sm">{student.name}</h3>
+                              <span className="bg-slate-100 text-slate-700 text-[10px] font-semibold px-2 py-0.5 rounded-full border border-slate-200">
+                                {student.grade}
+                              </span>
+                            </div>
+                            <p className="text-xs text-slate-500 font-medium">{student.school} • NIS {student.nis}</p>
+                          </div>
+                        </div>
+
+                        <button
+                          onClick={() => setShowStudentSelectorSheet(true)}
+                          className="bg-slate-100 hover:bg-slate-200 text-slate-800 p-2 rounded-2xl flex items-center gap-1 text-xs font-bold"
+                        >
+                          <ChevronDown className="w-4 h-4 text-slate-600" />
+                        </button>
+                      </div>
+
+                      {/* SECTION 1: SPP Status */}
+                      <div className="bg-white rounded-3xl border border-slate-200/80 shadow-xs overflow-hidden">
+                        <div className="bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900 p-3.5 text-white flex items-center justify-between">
+                          <div className="flex items-center gap-2">
+                            <div className="bg-[#72DFD0] text-slate-950 p-1.5 rounded-xl">
+                              <Receipt className="w-4 h-4" />
+                            </div>
+                            <h3 className="font-bold text-xs tracking-wide">Status Pembayaran SPP</h3>
+                          </div>
+                          <span className="text-[10px] text-slate-300 font-medium">{student.sppPeriod}</span>
+                        </div>
+
+                        <div className="p-4 space-y-3.5">
+                          <div className="flex items-center justify-between">
+                            <div>
+                              <p className="text-[11px] text-slate-500 font-medium">Tagihan SPP Bulanan</p>
+                              <p className="text-xl font-extrabold text-slate-900">{student.sppAmount}</p>
+                            </div>
+
+                            <div className="flex flex-col items-end gap-1">
+                              <span className="bg-emerald-500 text-white font-extrabold text-xs px-3 py-1 rounded-full flex items-center gap-1 shadow-xs">
+                                <CheckCircle2 className="w-3.5 h-3.5" />
+                                {student.sppStatus}
+                              </span>
+
+                              <span className="bg-[#E6FBF8] text-[#00A396] font-bold text-[10px] px-2 py-0.5 rounded-full flex items-center gap-1 border border-[#72DFD0]/40">
+                                <RefreshCw className="w-3 h-3" />
+                                Autodebit Aktif
+                              </span>
+                            </div>
+                          </div>
+
+                          <button
+                            onClick={() => setShowReceiptModal(true)}
+                            className="w-full bg-[#E6FBF8] hover:bg-[#72DFD0]/30 text-[#00897B] font-bold text-xs py-2.5 rounded-2xl flex items-center justify-center gap-2 border border-[#72DFD0]/40 transition-colors"
+                          >
+                            <Receipt className="w-4 h-4" />
+                            Lihat Bukti Bayar & Detail SPP
+                          </button>
+                        </div>
+                      </div>
+
+                      {/* SECTION 2: Pagu Jajan Kantin (Dynamic Slider) */}
+                      <div className="bg-white p-4 rounded-3xl border border-slate-200/80 shadow-xs space-y-4">
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center gap-2">
+                            <div className="bg-[#D4F933] text-slate-950 p-1.5 rounded-xl">
+                              <Utensils className="w-4 h-4" />
+                            </div>
+                            <div>
+                              <h3 className="font-bold text-slate-900 text-sm">Pagu Jajan Kantin</h3>
+                              <p className="text-[10px] text-slate-500 font-medium">Batas transaksi harian kartu jajan siswa</p>
+                            </div>
+                          </div>
+                        </div>
+
+                        <div className="space-y-2 bg-slate-50 p-3.5 rounded-2xl border border-slate-100">
+                          <div className="flex items-center justify-between text-xs font-bold">
+                            <span className="text-slate-600">Terpakai Hari Ini</span>
+                            <span className="text-slate-900 font-extrabold">
+                              Rp {student.spentToday.toLocaleString('id-ID')} / <span className="text-[#00A396]">Rp {student.dailyLimit.toLocaleString('id-ID')}</span>
+                            </span>
+                          </div>
+
+                          <div className="w-full h-3 bg-slate-200 rounded-full overflow-hidden p-0.5">
+                            <div
+                              className="h-full bg-gradient-to-r from-[#72DFD0] via-[#00B4A2] to-[#00A396] rounded-full transition-all duration-500"
+                              style={{
+                                width: `${Math.min(100, Math.round((student.spentToday / student.dailyLimit) * 100))}%`
+                              }}
+                            ></div>
+                          </div>
+
+                          <div className="flex items-center justify-between text-[10px] text-slate-500 font-semibold">
+                            <span>Sisa Pagu: Rp {Math.max(0, student.dailyLimit - student.spentToday).toLocaleString('id-ID')}</span>
+                            <span>{Math.round((student.spentToday / student.dailyLimit) * 100)}% Terpakai</span>
+                          </div>
+                        </div>
+
+                        {/* Today's Transactions History */}
+                        <div className="space-y-1.5">
+                          <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">
+                            Riwayat Transaksi Kantin Hari Ini
+                          </span>
+                          {student.canteenHistory.map((item) => (
+                            <div key={item.id} className="flex items-center justify-between text-xs p-2 rounded-xl bg-slate-50 border border-slate-100">
+                              <div className="flex items-center gap-2">
+                                <Utensils className="w-3.5 h-3.5 text-[#00A396]" />
+                                <span className="font-semibold text-slate-800">{item.title}</span>
+                              </div>
+                              <div className="text-right">
+                                <span className="font-bold text-slate-900 block">-Rp {item.price.toLocaleString('id-ID')}</span>
+                                <span className="text-[9px] text-slate-400 block">{item.time}</span>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+
+                        {/* Interactive Slider */}
+                        <div className="space-y-3 pt-2 border-t border-slate-100">
+                          <div className="flex items-center justify-between">
+                            <label className="text-xs font-bold text-slate-900 flex items-center gap-1.5">
+                              <Sliders className="w-4 h-4 text-[#00A396]" />
+                              Atur Batas Pagu Harian
+                            </label>
+                            <span className="text-sm font-extrabold text-[#00A396] bg-[#E6FBF8] px-2.5 py-0.5 rounded-lg border border-[#72DFD0]/40">
+                              Rp {student.dailyLimit.toLocaleString('id-ID')}
+                            </span>
+                          </div>
+
+                          <input
+                            type="range"
+                            min="10000"
+                            max="50000"
+                            step="5000"
+                            value={student.dailyLimit}
+                            onChange={handleLimitChange}
+                            className="w-full h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-[#00A396]"
+                          />
+
+                          <div className="grid grid-cols-4 gap-1.5 pt-1">
+                            {[10000, 20000, 30000, 50000].map((preset) => (
+                              <button
+                                key={preset}
+                                onClick={() => {
+                                  setStudentsData(prev => ({
+                                    ...prev,
+                                    [selectedStudentId]: {
+                                      ...prev[selectedStudentId],
+                                      dailyLimit: preset
+                                    }
+                                  }));
+                                  triggerToast(`Pagu harian diubah ke Rp ${preset.toLocaleString('id-ID')}`);
+                                }}
+                                className={`py-1 rounded-xl text-[11px] font-bold border transition-all ${
+                                  student.dailyLimit === preset
+                                    ? 'bg-slate-900 text-white border-slate-900'
+                                    : 'bg-slate-50 text-slate-600 border-slate-200 hover:bg-slate-100'
+                                }`}
+                              >
+                                {preset / 1000}rb
+                              </button>
+                            ))}
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* SECTION 3: Category Locker */}
+                      <div className="bg-white p-4 rounded-3xl border border-slate-200/80 shadow-xs space-y-3.5">
+                        <div className="flex items-center gap-2">
+                          <div className="bg-slate-900 text-[#72DFD0] p-1.5 rounded-xl">
+                            <ShieldCheck className="w-4 h-4" />
+                          </div>
+                          <div>
+                            <h3 className="font-bold text-slate-900 text-sm">Blokir Kategori Transaksi</h3>
+                            <p className="text-[10px] text-slate-500 font-medium">Kontrol merchant mana saja yang bisa diakses anak</p>
+                          </div>
+                        </div>
+
+                        <div className="space-y-2.5">
+                          {/* 1. Kantin Sekolah */}
+                          <div className="p-3 rounded-2xl bg-slate-50 border border-slate-100 flex items-center justify-between">
+                            <div className="flex items-center gap-3">
+                              <div className="w-9 h-9 rounded-xl bg-emerald-100 text-emerald-700 flex items-center justify-center shrink-0">
+                                <Utensils className="w-5 h-5" />
+                              </div>
+                              <div>
+                                <h4 className="font-bold text-xs text-slate-900">Kantin Sekolah (Makanan Sehat)</h4>
+                                <p className="text-[10px] text-slate-500">Merchant QRIS lingkungan sekolah</p>
+                                <span className="inline-block mt-0.5 text-[9px] font-bold text-emerald-600 bg-emerald-50 px-1.5 rounded">
+                                  Diizinkan
+                                </span>
+                              </div>
+                            </div>
+
+                            <button
+                              onClick={() => toggleCategory('kantin', 'Kantin Sekolah')}
+                              className={`w-12 h-6 rounded-full p-0.5 transition-colors relative ${
+                                student.categories.kantin ? 'bg-emerald-500' : 'bg-slate-300'
+                              }`}
+                            >
+                              <div className={`w-5 h-5 rounded-full bg-white shadow-md transform transition-transform ${
+                                student.categories.kantin ? 'translate-x-6' : 'translate-x-0'
+                              }`}></div>
+                            </button>
+                          </div>
+
+                          {/* 2. Game & Minimarket Luar */}
+                          <div className="p-3 rounded-2xl bg-slate-50 border border-slate-100 flex items-center justify-between">
+                            <div className="flex items-center gap-3">
+                              <div className="w-9 h-9 rounded-xl bg-rose-100 text-rose-600 flex items-center justify-center shrink-0">
+                                <Gamepad2 className="w-5 h-5" />
+                              </div>
+                              <div>
+                                <h4 className="font-bold text-xs text-slate-900">Game & Minimarket Luar</h4>
+                                <p className="text-[10px] text-slate-500">Top-up game, Steam, Indomaret/Alfamart</p>
+                                <span className={`inline-block mt-0.5 text-[9px] font-bold px-1.5 rounded ${
+                                  student.categories.game ? 'text-emerald-600 bg-emerald-50' : 'text-rose-600 bg-rose-50'
+                                }`}>
+                                  {student.categories.game ? 'Diizinkan' : 'Diblokir'}
+                                </span>
+                              </div>
+                            </div>
+
+                            <button
+                              onClick={() => toggleCategory('game', 'Game & Minimarket')}
+                              className={`w-12 h-6 rounded-full p-0.5 transition-colors relative ${
+                                student.categories.game ? 'bg-emerald-500' : 'bg-rose-500'
+                              }`}
+                            >
+                              <div className={`w-5 h-5 rounded-full bg-white shadow-md transform transition-transform ${
+                                student.categories.game ? 'translate-x-6' : 'translate-x-0'
+                              }`}></div>
+                            </button>
+                          </div>
+
+                          {/* 3. Transportasi */}
+                          <div className="p-3 rounded-2xl bg-slate-50 border border-slate-100 flex items-center justify-between">
+                            <div className="flex items-center gap-3">
+                              <div className="w-9 h-9 rounded-xl bg-blue-100 text-blue-700 flex items-center justify-center shrink-0">
+                                <Bus className="w-5 h-5" />
+                              </div>
+                              <div>
+                                <h4 className="font-bold text-xs text-slate-900">Transportasi & Ojek Online</h4>
+                                <p className="text-[10px] text-slate-500">Gojek, Grab, Trans Surabaya</p>
+                                <span className={`inline-block mt-0.5 text-[9px] font-bold px-1.5 rounded ${
+                                  student.categories.transport ? 'text-emerald-600 bg-emerald-50' : 'text-rose-600 bg-rose-50'
+                                }`}>
+                                  {student.categories.transport ? 'Diizinkan' : 'Diblokir'}
+                                </span>
+                              </div>
+                            </div>
+
+                            <button
+                              onClick={() => toggleCategory('transport', 'Transportasi')}
+                              className={`w-12 h-6 rounded-full p-0.5 transition-colors relative ${
+                                student.categories.transport ? 'bg-emerald-500' : 'bg-slate-300'
+                              }`}
+                            >
+                              <div className={`w-5 h-5 rounded-full bg-white shadow-md transform transition-transform ${
+                                student.categories.transport ? 'translate-x-6' : 'translate-x-0'
+                              }`}></div>
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* SECTION 4: Reward Banner */}
+                      <div
+                        onClick={() => setShowKprModal(true)}
+                        className="bg-gradient-to-br from-amber-500/10 via-amber-50 to-emerald-500/10 p-4 rounded-3xl border border-amber-300/60 shadow-xs cursor-pointer hover:border-amber-400"
+                      >
+                        <div className="flex items-start gap-3">
+                          <div className="w-10 h-10 rounded-2xl bg-amber-500 text-slate-950 flex items-center justify-center shrink-0 font-bold">
+                            <Sparkles className="w-5 h-5 text-slate-950" />
+                          </div>
+                          <div className="space-y-1">
+                            <span className="text-amber-800 font-extrabold text-xs">🌟 Reward Kedisiplinan SPP</span>
+                            <p className="text-xs text-slate-800 font-semibold leading-snug">
+                              Anda berhak mendapatkan <span className="text-[#00897B] font-bold underline">KPR Flexi BNI Bunga 2.75%</span> Pre-Approved!
+                            </p>
+                          </div>
+                        </div>
+                      </div>
+
+                    </div>
+                  )}
+                </>
+              )}
+
+            </div>
+
+            {/* Bottom Nav Bar (Shared across app modes) */}
+            <div className="bg-white/95 backdrop-blur-md border-t border-slate-200/80 px-4 py-2.5 flex items-center justify-around z-30 relative shrink-0">
+              <button
+                onClick={() => { setAppMode('parent'); setCurrentScreen('home'); }}
+                className={`flex flex-col items-center gap-1 ${
+                  appMode === 'parent' && currentScreen === 'home' ? 'text-[#00A396]' : 'text-slate-400'
+                }`}
+              >
+                <Send className="w-5 h-5" />
+                <span className="text-[10px] font-bold">Home</span>
+              </button>
+
+              <button
+                onClick={() => { setAppMode('parent'); setCurrentScreen('education'); }}
+                className={`flex flex-col items-center gap-1 ${
+                  appMode === 'parent' && currentScreen === 'education' ? 'text-[#00A396]' : 'text-slate-400'
+                }`}
+              >
+                <GraduationCap className="w-5 h-5" />
+                <span className="text-[10px] font-bold">Parent Hub</span>
+              </button>
+
+              <div className="relative -top-5">
+                <button
+                  onClick={() => triggerToast('Fitur Scan QRIS Siap')}
+                  className="w-14 h-14 bg-slate-950 rounded-full flex flex-col items-center justify-center border-4 border-[#F8FAFC] shadow-xl text-white active:scale-95 transition-transform"
+                >
+                  <img src="/assets/qris-icon.svg" alt="QRIS" className="w-7 h-7 object-contain" />
+                </button>
+              </div>
+
+              <button
+                onClick={() => setAppMode('merchant')}
+                className={`flex flex-col items-center gap-1 ${
+                  appMode === 'merchant' ? 'text-[#F37021] font-bold' : 'text-slate-400'
+                }`}
+              >
+                <Store className="w-5 h-5" />
+                <span className="text-[10px] font-bold">POS Kantin</span>
+              </button>
+
+              <button
+                onClick={() => setAppMode('treasury')}
+                className={`flex flex-col items-center gap-1 ${
+                  appMode === 'treasury' ? 'text-teal-600 font-bold' : 'text-slate-400'
+                }`}
+              >
+                <Building2 className="w-5 h-5" />
+                <span className="text-[10px] font-bold">B2B Portal</span>
+              </button>
+            </div>
+
+            {/* Home Bar Indicator */}
+            <div className="bg-white py-1 flex justify-center shrink-0">
+              <div className="w-32 h-1 bg-slate-300 rounded-full"></div>
+            </div>
+
+            {/* MODALS */}
+            {showReceiptModal && (
+              <div className="absolute inset-0 bg-slate-950/70 backdrop-blur-xs z-50 flex items-end justify-center p-0">
+                <div className="bg-white w-full rounded-t-3xl p-5 space-y-4 border-t border-slate-200 animate-in slide-in-from-bottom duration-300">
+                  <div className="flex items-center justify-between border-b border-slate-100 pb-3">
+                    <div className="flex items-center gap-2">
+                      <img src="/assets/bni-logo.png" alt="BNI" className="h-4 object-contain" />
+                      <h3 className="font-extrabold text-slate-900 text-sm">Bukti Pembayaran SPP</h3>
+                    </div>
+                    <button onClick={() => setShowReceiptModal(false)} className="p-1 text-slate-400">
+                      <X className="w-5 h-5" />
+                    </button>
+                  </div>
+
+                  <div className="bg-slate-50 p-4 rounded-2xl border border-slate-200/80 space-y-2 text-xs">
+                    <div className="text-center pb-2 border-b border-dashed border-slate-300">
+                      <span className="bg-emerald-500 text-white text-[10px] font-extrabold px-2.5 py-0.5 rounded-full uppercase inline-block">
+                        LUNAS (Autodebit)
+                      </span>
+                      <p className="font-extrabold text-slate-900 text-base mt-1">{student.sppAmount}</p>
+                    </div>
+                    <div className="space-y-1 pt-1 text-slate-600">
+                      <div className="flex justify-between"><span>Nama Siswa</span><span className="font-bold text-slate-900">{student.name}</span></div>
+                      <div className="flex justify-between"><span>Sekolah</span><span className="font-bold text-slate-900">{student.school}</span></div>
+                      <div className="flex justify-between"><span>Periode</span><span className="font-bold text-slate-900">{student.sppPeriod}</span></div>
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-2 pt-1">
+                    <button onClick={() => { triggerToast('Bukti diunduh'); setShowReceiptModal(false); }} className="py-2.5 rounded-2xl bg-slate-100 font-bold text-xs">
+                      <Download className="w-4 h-4 inline mr-1" /> Unduh
+                    </button>
+                    <button onClick={() => { triggerToast('Bukti disalin'); setShowReceiptModal(false); }} className="py-2.5 rounded-2xl bg-[#72DFD0] text-slate-950 font-bold text-xs">
+                      <Share2 className="w-4 h-4 inline mr-1" /> Bagikan
+                    </button>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {showKprModal && (
+              <div className="absolute inset-0 bg-slate-950/70 backdrop-blur-xs z-50 flex items-end justify-center p-0">
+                <div className="bg-white w-full rounded-t-3xl p-5 space-y-4 border-t border-slate-200 animate-in slide-in-from-bottom duration-300">
+                  <div className="flex items-center justify-between border-b border-slate-100 pb-3">
+                    <h3 className="font-extrabold text-slate-900 text-sm">Reward Special BNI</h3>
+                    <button onClick={() => setShowKprModal(false)} className="p-1 text-slate-400">
+                      <X className="w-5 h-5" />
+                    </button>
+                  </div>
+                  <div className="bg-gradient-to-r from-orange-500 to-amber-500 text-white p-4 rounded-2xl space-y-1">
+                    <h4 className="font-extrabold text-base">BNI KPR Flexi Bunga 2.75% p.a.</h4>
+                    <p className="text-xs text-orange-100">Reward atas disiplin SPP 12 bulan berturut-turut.</p>
+                  </div>
+                  <button onClick={() => { triggerToast('Pengajuan KPR diproses!'); setShowKprModal(false); }} className="w-full py-3 rounded-2xl bg-slate-900 text-white font-extrabold text-xs">
+                    Ajukan Sekarang
+                  </button>
+                </div>
+              </div>
+            )}
+
+            {showStudentSelectorSheet && (
+              <div className="absolute inset-0 bg-slate-950/70 backdrop-blur-xs z-50 flex items-end justify-center p-0">
+                <div className="bg-white w-full rounded-t-3xl p-5 space-y-4 border-t border-slate-200 animate-in slide-in-from-bottom duration-300">
+                  <div className="flex items-center justify-between border-b border-slate-100 pb-3">
+                    <h3 className="font-extrabold text-slate-900 text-sm">Pilih Siswa (Kartu Anak)</h3>
+                    <button onClick={() => setShowStudentSelectorSheet(false)} className="p-1 text-slate-400">
+                      <X className="w-5 h-5" />
+                    </button>
+                  </div>
+                  <div className="space-y-2">
+                    <button
+                      onClick={() => { setSelectedStudentId('akbar'); setShowStudentSelectorSheet(false); triggerToast('Profil berpindah ke Akbar'); }}
+                      className={`w-full p-3 rounded-2xl border text-left flex items-center justify-between ${
+                        selectedStudentId === 'akbar' ? 'border-[#72DFD0] bg-[#E6FBF8]/50' : 'border-slate-200'
+                      }`}
+                    >
+                      <div className="flex items-center gap-3">
+                        <img src={studentsData.akbar.avatar} alt="Akbar" className="w-9 h-9 rounded-full object-cover" />
+                        <div><h4 className="font-bold text-xs text-slate-900">Akbar Putra</h4><p className="text-[10px] text-slate-500">SMA 1 Surabaya</p></div>
+                      </div>
+                      {selectedStudentId === 'akbar' && <Check className="w-4 h-4 text-[#00A396]" />}
+                    </button>
+
+                    <button
+                      onClick={() => { setSelectedStudentId('aisha'); setShowStudentSelectorSheet(false); triggerToast('Profil berpindah ke Aisha'); }}
+                      className={`w-full p-3 rounded-2xl border text-left flex items-center justify-between ${
+                        selectedStudentId === 'aisha' ? 'border-[#72DFD0] bg-[#E6FBF8]/50' : 'border-slate-200'
+                      }`}
+                    >
+                      <div className="flex items-center gap-3">
+                        <img src={studentsData.aisha.avatar} alt="Aisha" className="w-9 h-9 rounded-full object-cover" />
+                        <div><h4 className="font-bold text-xs text-slate-900">Aisha Putri</h4><p className="text-[10px] text-slate-500">SMP 2 Surabaya</p></div>
+                      </div>
+                      {selectedStudentId === 'aisha' && <Check className="w-4 h-4 text-[#00A396]" />}
+                    </button>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {showNotificationDrawer && (
+              <div className="absolute inset-0 bg-slate-950/70 backdrop-blur-xs z-50 flex items-end justify-center p-0">
+                <div className="bg-white w-full rounded-t-3xl p-5 space-y-3 border-t border-slate-200 animate-in slide-in-from-bottom duration-300">
+                  <div className="flex items-center justify-between border-b border-slate-100 pb-2">
+                    <h3 className="font-bold text-xs text-slate-900">Notifikasi Real-Time</h3>
+                    <button onClick={() => setShowNotificationDrawer(false)} className="p-1 text-slate-400"><X className="w-5 h-5" /></button>
+                  </div>
+                  <div className="space-y-2 text-xs">
+                    <div className="p-3 rounded-2xl bg-[#E6FBF8] border border-[#72DFD0]/40">
+                      <span className="text-[10px] font-bold text-[#00A396]">SPP Autodebit Lunas</span>
+                      <p className="font-bold text-slate-900">SPP Bulan Juli Akbar Rp 1.500.000 terdebit</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
+
+          </div>
+
+        </div>
+
+      </div>
+
+    </div>
+  );
+}
