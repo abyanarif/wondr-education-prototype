@@ -184,7 +184,7 @@ export default function MerchantKantin({
             <Store className="w-5 h-5" />
           </div>
           <div>
-            <div className="flex items-center gap-2">
+            <div className="flex flex-wrap items-center gap-2">
               <h2 className="font-extrabold text-xs tracking-tight text-white">
                 {currentMode === 'kampus' ? 'POS Juragan Merchant - Kantin Pusat Kampus B Unair' : merchantInfo.name}
               </h2>
@@ -195,6 +195,12 @@ export default function MerchantKantin({
               }`}>
                 {currentMode === 'kampus' ? '⚡ Settlement Instan H+0 ke Rekening BNI Juragan' : 'POS Online'}
               </span>
+
+              {currentMode === 'kampus' && (
+                <span className="bg-amber-500/20 text-amber-300 font-extrabold text-[9px] px-2 py-0.5 rounded-full border border-amber-400/40 flex items-center gap-1 shadow-xs">
+                  🔊 BNI Soundbox Lite Active (Konfirmasi Suara QRIS On)
+                </span>
+              )}
             </div>
             <p className="text-[10px] text-slate-400 font-medium flex items-center gap-1.5 mt-0.5">
               <span>Kasir: <strong className="text-slate-200">{merchantInfo.cashier}</strong></span>
@@ -358,9 +364,30 @@ export default function MerchantKantin({
               }`}
             >
               <CreditCard className="w-4 h-4" />
-              PROSES BAYAR (TAP KARTU SISWA)
+              {currentMode === 'kampus' ? 'PROSES BAYAR (QRIS / TAP KTM)' : 'PROSES BAYAR (TAP KARTU SISWA)'}
             </button>
           </div>
+
+          {/* B2B Working Capital Credit Offer Card (BNI / hibank) for Kampus Mode */}
+          {currentMode === 'kampus' && (
+            <div className="bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 text-white p-3.5 rounded-2xl border border-teal-500/40 space-y-2 text-xs">
+              <div className="flex items-center justify-between">
+                <span className="font-extrabold text-[#72DFD0] text-xs flex items-center gap-1.5">
+                  💼 Penawaran Kredit Modal Kerja BNI/hibank
+                </span>
+                <span className="bg-emerald-500 text-white font-black text-[9px] px-1.5 py-0.5 rounded">Pre-Approved</span>
+              </div>
+              <p className="text-[11px] text-slate-300 leading-snug">
+                Pre-approved hingga <strong>Rp 15.000.000</strong> berbasis data omzet QRIS H+0 Anda.
+              </p>
+              <button
+                onClick={() => alert('🚀 Pengajuan Kredit Modal Kerja BNI/hibank Rp 15.000.000 berhasil dikirim! Tim BNI Juragan akan melakukan verifikasi.')}
+                className="w-full bg-[#00A396] hover:bg-teal-600 text-white font-bold py-2 rounded-xl text-xs transition-colors shadow-xs"
+              >
+                Ajukan 1-Klik via hibank API
+              </button>
+            </div>
+          )}
         </div>
 
       </div>
