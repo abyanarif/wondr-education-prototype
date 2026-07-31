@@ -7,14 +7,11 @@ import {
   AlertTriangle,
   Send,
   Search,
-  Download,
   Zap,
   FileText,
   DollarSign,
   X,
-  CreditCard,
   FileSpreadsheet,
-  Calendar,
   Check
 } from 'lucide-react';
 import { initialTreasuryStudents, treasuryMetrics } from '../dummyData';

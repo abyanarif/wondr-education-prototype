@@ -7,7 +7,6 @@ import {
   Eye,
   EyeOff,
   Copy,
-  Plus,
   Send,
   CreditCard,
   Receipt,
@@ -20,17 +19,13 @@ import {
   RefreshCw,
   Sliders,
   Sparkles,
-  Check,
   X,
   ChevronRight,
-  Download,
-  Share2,
   Utensils,
   School,
   Store,
   Building2,
   Smartphone,
-  ArrowRightLeft,
   Link2,
   Trophy
 } from 'lucide-react';
@@ -448,7 +443,7 @@ export default function App() {
               )}
 
               {/* MAIN MOBILE CONTENT */}
-              <div className="flex-1 overflow-y-auto no-scrollbar relative flex flex-col">
+              <div className="flex-1 overflow-y-auto overflow-x-hidden no-scrollbar relative flex flex-col">
                 
                 {/* SCREEN 3: KASIR KANTIN POS ENGINE */}
                 {appMode === 'merchant' && (

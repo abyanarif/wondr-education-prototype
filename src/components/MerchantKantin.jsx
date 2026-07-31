@@ -7,7 +7,6 @@ import {
   Soup,
   Sandwich,
   CheckCircle2,
-  AlertTriangle,
   Plus,
   Minus,
   Trash2,
