@@ -15,13 +15,8 @@ export const initialStudentsData = {
     autoDebitDate: 'Tanggal 10 setiap bulan',
     spentToday: 12000,
     dailyLimit: 20000,
-    categories: {
-      kantin: true,     // Kantin Sekolah (Makanan Sehat) -> ENABLED
-      game: false,      // Game & Minimarket Luar -> BLOCKED
-      transport: true,  // Transportasi & Ojek Online -> ENABLED
-    },
     canteenHistory: [
-      { id: 101, title: 'Soto Ayam Kantin Utama', time: '10:15 WIB', price: 12000, category: 'kantin', status: 'Berhasil' }
+      { id: 101, title: 'Soto Ayam Kantin Utama', time: '10:15 WIB', price: 12000, status: 'Berhasil' }
     ]
   },
   aisha: {
@@ -40,13 +35,8 @@ export const initialStudentsData = {
     autoDebitDate: 'Tanggal 10 setiap bulan',
     spentToday: 8000,
     dailyLimit: 15000,
-    categories: {
-      kantin: true,
-      game: false,
-      transport: true,
-    },
     canteenHistory: [
-      { id: 201, title: 'Roti & Susu Kantin SMP', time: '09:45 WIB', price: 8000, category: 'kantin', status: 'Berhasil' }
+      { id: 201, title: 'Roti & Susu Kantin SMP', time: '09:45 WIB', price: 8000, status: 'Berhasil' }
     ]
   }
 };
@@ -56,9 +46,6 @@ export const canteenMenuItems = [
     id: 'item-1',
     name: 'Nasi Goreng Sehat',
     price: 12000,
-    category: 'kantin',
-    categoryName: 'Kantin Sekolah (Makanan Sehat)',
-    isAllowedDefault: true,
     icon: 'Utensils',
     badge: 'Favorite'
   },
@@ -66,51 +53,36 @@ export const canteenMenuItems = [
     id: 'item-2',
     name: 'Es Teh Manis',
     price: 5000,
-    category: 'kantin',
-    categoryName: 'Kantin Sekolah (Makanan Sehat)',
-    isAllowedDefault: true,
     icon: 'Coffee',
     badge: 'Segar'
   },
   {
     id: 'item-3',
-    name: 'Voucher Game / Topup',
-    price: 10000,
-    category: 'game',
-    categoryName: 'Game & Minimarket Luar',
-    isAllowedDefault: false,
-    icon: 'Gamepad2',
-    badge: 'Terkunci'
-  },
-  {
-    id: 'item-4',
     name: 'Soto Ayam Spesial',
     price: 15000,
-    category: 'kantin',
-    categoryName: 'Kantin Sekolah (Makanan Sehat)',
-    isAllowedDefault: true,
     icon: 'Soup',
     badge: 'Populer'
   },
   {
-    id: 'item-5',
+    id: 'item-4',
     name: 'Roti Bakar Keju',
     price: 8000,
-    category: 'kantin',
-    categoryName: 'Kantin Sekolah (Makanan Sehat)',
-    isAllowedDefault: true,
     icon: 'Sandwich',
     badge: 'Cemilan'
   },
   {
+    id: 'item-5',
+    name: 'Jus Buah Segar',
+    price: 10000,
+    icon: 'Coffee',
+    badge: 'Sehat'
+  },
+  {
     id: 'item-6',
-    name: 'Topup Diamond ML / FF',
-    price: 20000,
-    category: 'game',
-    categoryName: 'Game & Minimarket Luar',
-    isAllowedDefault: false,
-    icon: 'Sparkles',
-    badge: 'Terkunci'
+    name: 'Snack Buah Potong',
+    price: 6000,
+    icon: 'Utensils',
+    badge: 'Vitamin'
   }
 ];
 
@@ -211,7 +183,8 @@ export const treasuryMetrics = {
   initialCollectedAmount: 1450000000,
   totalStudents: 1200,
   initialPaidStudents: 1104,
-  badDebtRate: '8%', // 2x lower than manual methods
+  badDebtRate: '8%',
+  autodebitUsersRate: '92%',
   giroAccountNo: '992019283019',
   giroAccountName: 'Giro SMAN 1 Surabaya Operational'
 };
