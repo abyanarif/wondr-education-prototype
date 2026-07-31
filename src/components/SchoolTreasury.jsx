@@ -19,7 +19,7 @@ import {
 } from 'lucide-react';
 import { initialTreasuryStudents, treasuryMetrics } from '../dummyData';
 
-export default function SchoolTreasury({ onTriggerNotification }) {
+export default function SchoolTreasury({ currentMode = 'sekolah', onTriggerNotification }) {
   const [students, setStudents] = useState(initialTreasuryStudents);
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedClass, setSelectedClass] = useState('ALL');
@@ -83,7 +83,7 @@ export default function SchoolTreasury({ onTriggerNotification }) {
     setReminderModal({ show: false, student: null });
 
     onTriggerNotification(
-      `🔔 BNI Open API Notice: Tagihan SPP ${targetStudent.name} (Rp ${targetStudent.sppAmount.toLocaleString('id-ID')}) berhasil dilunasi via autodebit wondr by BNI`
+      `🔔 BNI Open API Notice: Tagihan ${currentMode === 'kampus' ? 'UKT' : 'SPP'} ${targetStudent.name} (Rp ${targetStudent.sppAmount.toLocaleString('id-ID')}) berhasil dilunasi via autodebit wondr by BNI`
     );
   };
 
@@ -99,14 +99,17 @@ export default function SchoolTreasury({ onTriggerNotification }) {
           <div>
             <div className="flex items-center gap-2.5">
               <h1 className="font-extrabold text-lg tracking-tight text-white">
-                BNI Cash Management System
+                {currentMode === 'kampus' ? 'BNI Cash Management System - Portal Keuangan Universitas' : 'BNI Cash Management System'}
               </h1>
               <span className="bg-[#72DFD0] text-slate-950 font-black text-[10px] px-2.5 py-0.5 rounded-full uppercase tracking-wider flex items-center gap-1">
                 <Zap className="w-3 h-3" /> Open API
               </span>
             </div>
             <p className="text-xs text-teal-100 font-medium mt-0.5">
-              Portal Bendahara Sekolah & Rekonsiliasi Otomatis SPP • <b>SMAN 1 Surabaya</b> (Giro BNI: {treasuryMetrics.giroAccountNo})
+              {currentMode === 'kampus'
+                ? <>Portal Rektorat & Rekonsiliasi Otomatis SPC H2H • <b>Universitas Airlangga</b> (Giro BNI Rektorat: 0987654321)</>
+                : <>Portal Bendahara Sekolah & Rekonsiliasi Otomatis SPP • <b>SMAN 1 Surabaya</b> (Giro BNI: {treasuryMetrics.giroAccountNo})</>
+              }
             </p>
           </div>
         </div>
@@ -119,7 +122,7 @@ export default function SchoolTreasury({ onTriggerNotification }) {
           </div>
 
           <button
-            onClick={() => alert('Laporan SPP SMAN 1 Surabaya (Excel/PDF) berhasil diunduh.')}
+            onClick={() => alert(currentMode === 'kampus' ? 'Laporan UKT & Endapan Giro Kampus UNAIR (Excel/PDF) berhasil diunduh.' : 'Laporan SPP SMAN 1 Surabaya (Excel/PDF) berhasil diunduh.')}
             className="bg-[#005E6A] hover:bg-teal-700 text-white font-extrabold text-xs px-4 py-2.5 rounded-xl border border-teal-400/40 flex items-center gap-2 shadow-sm transition-all active:scale-95"
           >
             <FileSpreadsheet className="w-4 h-4 text-[#72DFD0]" />
@@ -134,10 +137,12 @@ export default function SchoolTreasury({ onTriggerNotification }) {
         {/* Top 4 Metrics Grid Cards */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
           
-          {/* Metric 1: Total SPP Collected */}
+          {/* Metric 1: Total SPP / UKT Collected */}
           <div className="bg-white p-5 rounded-3xl border border-slate-200/80 shadow-xs space-y-3 relative overflow-hidden">
             <div className="flex items-center justify-between">
-              <span className="text-slate-500 font-bold text-xs">Total Penerimaan SPP</span>
+              <span className="text-slate-500 font-bold text-xs">
+                {currentMode === 'kampus' ? 'Total Penerimaan UKT Semester Ini' : 'Total Penerimaan SPP'}
+              </span>
               <div className="bg-[#E6FBF8] text-[#00A396] p-2.5 rounded-2xl">
                 <DollarSign className="w-5 h-5" />
               </div>
@@ -145,10 +150,10 @@ export default function SchoolTreasury({ onTriggerNotification }) {
 
             <div>
               <h3 className="text-2xl font-black text-slate-900 tracking-tight">
-                Rp {totalCollectedAmount.toLocaleString('id-ID')}
+                {currentMode === 'kampus' ? 'Rp 18.450.000.000' : `Rp ${totalCollectedAmount.toLocaleString('id-ID')}`}
               </h3>
               <p className="text-[11px] text-slate-500 font-semibold mt-0.5">
-                Target: Rp {treasuryMetrics.totalTargetAmount.toLocaleString('id-ID')}
+                {currentMode === 'kampus' ? 'Target: Rp 20.000.000.000 (92% Lunas)' : `Target: Rp ${treasuryMetrics.totalTargetAmount.toLocaleString('id-ID')}`}
               </p>
             </div>
 
@@ -156,58 +161,63 @@ export default function SchoolTreasury({ onTriggerNotification }) {
               <div className="w-full h-2.5 bg-slate-100 rounded-full overflow-hidden">
                 <div
                   className="h-full bg-gradient-to-r from-[#00A396] to-emerald-500 rounded-full transition-all duration-500"
-                  style={{ width: `${collectionPercentage}%` }}
+                  style={{ width: `${currentMode === 'kampus' ? 92 : collectionPercentage}%` }}
                 ></div>
               </div>
               <div className="flex justify-between text-[11px] text-slate-600 font-extrabold">
-                <span>Capaian Juli 2026</span>
-                <span className="text-emerald-600">{collectionPercentage}% Terkumpul</span>
+                <span>Capaian Semester 5</span>
+                <span className="text-emerald-600">{currentMode === 'kampus' ? '92% Lunas' : `${collectionPercentage}% Terkumpul`}</span>
               </div>
             </div>
           </div>
 
-          {/* Metric 2: Students Paid */}
+          {/* Metric 2: Endapan Giro / Students Paid */}
           <div className="bg-white p-5 rounded-3xl border border-slate-200/80 shadow-xs space-y-3 relative overflow-hidden">
             <div className="flex items-center justify-between">
-              <span className="text-slate-500 font-bold text-xs">Siswa Lunas SPP</span>
+              <span className="text-slate-500 font-bold text-xs">
+                {currentMode === 'kampus' ? 'Endapan Giro Operasional Kampus' : 'Siswa Lunas SPP'}
+              </span>
               <div className="bg-emerald-100 text-emerald-700 p-2.5 rounded-2xl">
-                <Users className="w-5 h-5" />
-              </div>
-            </div>
-
-            <div>
-              <h3 className="text-2xl font-black text-slate-900 tracking-tight">
-                {paidStudentsTotal} <span className="text-sm text-slate-500 font-bold">/ {totalStudentsCount} Siswa</span>
-              </h3>
-              <p className="text-[11px] text-emerald-600 font-bold mt-0.5 flex items-center gap-1">
-                <CheckCircle2 className="w-3.5 h-3.5" /> Terbayar via BNI Autodebit & Transfer
-              </p>
-            </div>
-
-            <div className="bg-emerald-50 p-2 rounded-xl border border-emerald-100 text-[11px] text-emerald-800 font-semibold flex items-center justify-between">
-              <span>Sisa Menunggak: {totalStudentsCount - paidStudentsTotal} Siswa</span>
-              <span className="font-extrabold text-emerald-700">Live Sync</span>
-            </div>
-          </div>
-
-          {/* Metric 3: Unpaid Rate */}
-          <div className="bg-white p-5 rounded-3xl border border-slate-200/80 shadow-xs space-y-3 relative overflow-hidden">
-            <div className="flex items-center justify-between">
-              <span className="text-slate-500 font-bold text-xs">Rasio Tunggakan (Bad Debt)</span>
-              <div className="bg-amber-100 text-amber-700 p-2.5 rounded-2xl">
                 <TrendingUp className="w-5 h-5" />
               </div>
             </div>
 
             <div>
+              <h3 className="text-2xl font-black text-slate-900 tracking-tight">
+                {currentMode === 'kampus' ? 'Rp 45.200.000.000' : paidStudentsTotal}
+              </h3>
+              <p className="text-[11px] text-emerald-600 font-bold mt-0.5 flex items-center gap-1">
+                <CheckCircle2 className="w-3.5 h-3.5" />
+                {currentMode === 'kampus' ? 'Special Yield Giro BNI 5.5% p.a.' : 'Terbayar via BNI Autodebit & VA'}
+              </p>
+            </div>
+
+            <div className="bg-emerald-50 p-2 rounded-xl border border-emerald-100 text-[11px] text-emerald-800 font-semibold flex items-center justify-between">
+              <span>{currentMode === 'kampus' ? 'Rekening Utama Rektorat' : `Sisa Menunggak: ${totalStudentsCount - paidStudentsTotal} Siswa`}</span>
+              <span className="font-extrabold text-emerald-700">Live Sync</span>
+            </div>
+          </div>
+
+          {/* Metric 3: Beasiswa Disbursed */}
+          <div className="bg-white p-5 rounded-3xl border border-slate-200/80 shadow-xs space-y-3 relative overflow-hidden">
+            <div className="flex items-center justify-between">
+              <span className="text-slate-500 font-bold text-xs">
+                {currentMode === 'kampus' ? 'Beasiswa Disbursed' : 'Rasio Tunggakan (Bad Debt)'}
+              </span>
+              <div className="bg-amber-100 text-amber-700 p-2.5 rounded-2xl">
+                <Users className="w-5 h-5" />
+              </div>
+            </div>
+
+            <div>
               <h3 className="text-2xl font-black text-[#003B46] tracking-tight flex items-center gap-2">
-                {treasuryMetrics.badDebtRate}
+                {currentMode === 'kampus' ? '450 Mahasiswa' : treasuryMetrics.badDebtRate}
                 <span className="text-xs bg-emerald-100 text-emerald-700 font-bold px-2 py-0.5 rounded-full">
-                  -50% vs Manual
+                  {currentMode === 'kampus' ? 'Auto H+0' : '-50% vs Manual'}
                 </span>
               </h3>
               <p className="text-[11px] text-slate-500 font-medium mt-0.5">
-                Dua kali lipat lebih rendah dibanding metode penagihan manual.
+                {currentMode === 'kampus' ? 'Penyaluran Beasiswa Talent BNI & KIP-K' : 'Dua kali lipat lebih rendah dibanding penagihan manual.'}
               </p>
             </div>
 
@@ -216,10 +226,12 @@ export default function SchoolTreasury({ onTriggerNotification }) {
             </div>
           </div>
 
-          {/* Metric 4: Active Autodebit Users Rate */}
+          {/* Metric 4: Active Autodebit / Kas Ormawa */}
           <div className="bg-white p-5 rounded-3xl border border-slate-200/80 shadow-xs space-y-3 relative overflow-hidden">
             <div className="flex items-center justify-between">
-              <span className="text-slate-500 font-bold text-xs">Pengguna Autodebit Aktif</span>
+              <span className="text-slate-500 font-bold text-xs">
+                {currentMode === 'kampus' ? 'Kas Komunitas Ormawa & VA' : 'Pengguna Autodebit Aktif'}
+              </span>
               <div className="bg-teal-100 text-teal-800 p-2.5 rounded-2xl">
                 <Zap className="w-5 h-5 text-[#00A396]" />
               </div>
@@ -227,31 +239,34 @@ export default function SchoolTreasury({ onTriggerNotification }) {
 
             <div>
               <h3 className="text-2xl font-black text-[#00897B] tracking-tight">
-                {treasuryMetrics.autodebitUsersRate}
+                {currentMode === 'kampus' ? '128 Komunitas' : treasuryMetrics.autodebitUsersRate}
               </h3>
               <p className="text-[11px] text-slate-500 font-medium mt-0.5">
-                1.104 orang tua terhubung ke wondr Autodebit
+                {currentMode === 'kampus' ? '100% Dual-Approval BNI Open API' : '1.104 orang tua terhubung ke wondr Autodebit'}
               </p>
             </div>
 
             <div className="bg-[#E6FBF8] p-2 rounded-xl border border-[#72DFD0]/40 text-[11px] text-[#00897B] font-bold">
-              ✓ Tagihan Otomatis Tiap Tgl 10
+              {currentMode === 'kampus' ? '✓ Settlement Instan BNI API' : '✓ Tagihan Otomatis Tiap Tgl 10'}
             </div>
           </div>
 
         </div>
 
-        {/* Main Student SPP Records Data Table Container */}
+        {/* Main Student SPP / UKT Records Data Table Container */}
         <div className="bg-white rounded-3xl border border-slate-200/80 shadow-sm p-6 space-y-4">
           
           {/* Table Toolbar */}
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-slate-100">
             <div>
               <h2 className="font-extrabold text-slate-900 text-base flex items-center gap-2">
-                <FileText className="w-5 h-5 text-[#00A396]" /> Data Pembayaran SPP Siswa (Juli 2026)
+                <FileText className="w-5 h-5 text-[#00A396]" />
+                {currentMode === 'kampus' ? 'Data Pembayaran UKT Semester Mahasiswa (Juli 2026)' : 'Data Pembayaran SPP Siswa (Juli 2026)'}
               </h2>
               <p className="text-xs text-slate-500 font-medium mt-0.5">
-                Pencatatan real-time autodebit wondr app & transfer VA BNI SMAN 1 Surabaya
+                {currentMode === 'kampus'
+                  ? 'Pencatatan real-time autodebit wondr app & transfer Virtual Account BNI Universitas Airlangga'
+                  : 'Pencatatan real-time autodebit wondr app & transfer VA BNI SMAN 1 Surabaya'}
               </p>
             </div>
 
@@ -260,7 +275,7 @@ export default function SchoolTreasury({ onTriggerNotification }) {
                 <Search className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
                 <input
                   type="text"
-                  placeholder="Cari Siswa, NIS, atau Orang Tua..."
+                  placeholder={currentMode === 'kampus' ? 'Cari Mahasiswa, NIM, atau Fakultas...' : 'Cari Siswa, NIS, atau Orang Tua...'}
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   className="w-full pl-9 pr-4 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold focus:outline-none focus:border-[#00A396]"
@@ -272,11 +287,11 @@ export default function SchoolTreasury({ onTriggerNotification }) {
                 onChange={(e) => setSelectedClass(e.target.value)}
                 className="bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs font-bold text-slate-700 focus:outline-none focus:border-[#00A396]"
               >
-                <option value="ALL">Semua Kelas</option>
-                <option value="Kelas 11 IPA 2">Kelas 11 IPA 2</option>
-                <option value="Kelas 11 IPS 1">Kelas 11 IPS 1</option>
-                <option value="Kelas 11 IPA 1">Kelas 11 IPA 1</option>
-                <option value="Kelas 8 B">Kelas 8 B</option>
+                <option value="ALL">Semua Fakultas/Prodi</option>
+                <option value="Kelas 11 IPA 2">FST / Sistem Informasi</option>
+                <option value="Kelas 11 IPS 1">FEB / Manajemen</option>
+                <option value="Kelas 11 IPA 1">FK / Kedokteran Gigi</option>
+                <option value="Kelas 8 B">FH / Hukum</option>
               </select>
             </div>
           </div>
@@ -286,23 +301,23 @@ export default function SchoolTreasury({ onTriggerNotification }) {
             <table className="w-full text-left border-collapse text-xs">
               <thead>
                 <tr className="bg-slate-50 border-b border-slate-200 text-slate-500 font-bold text-xs uppercase tracking-wider">
-                  <th className="py-3 px-4">NIS</th>
-                  <th className="py-3 px-4">Nama Siswa</th>
-                  <th className="py-3 px-4">Kelas</th>
-                  <th className="py-3 px-4">Nama Orang Tua</th>
-                  <th className="py-3 px-4">Nominal SPP</th>
-                  <th className="py-3 px-4">Status SPP</th>
+                  <th className="py-3 px-4">{currentMode === 'kampus' ? 'NIM' : 'NIS'}</th>
+                  <th className="py-3 px-4">{currentMode === 'kampus' ? 'Nama Mahasiswa' : 'Nama Siswa'}</th>
+                  <th className="py-3 px-4">{currentMode === 'kampus' ? 'Prodi / Kelas' : 'Kelas'}</th>
+                  <th className="py-3 px-4">{currentMode === 'kampus' ? 'Fakultas / Wali' : 'Nama Orang Tua'}</th>
+                  <th className="py-3 px-4">{currentMode === 'kampus' ? 'Nominal UKT' : 'Nominal SPP'}</th>
+                  <th className="py-3 px-4">{currentMode === 'kampus' ? 'Status UKT' : 'Status SPP'}</th>
                   <th className="py-3 px-4">Metode & Tanggal</th>
-                  <th className="py-3 px-4 text-right">Aksi Penagihan</th>
+                  <th className="py-3 px-4 text-right">Aksi Portal</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100 font-medium">
                 {filteredStudents.map((std) => (
                   <tr key={std.id} className="hover:bg-slate-50/80 transition-colors">
                     
-                    {/* NIS */}
+                    {/* NIM / NIS */}
                     <td className="py-3.5 px-4 font-mono text-slate-500 font-semibold">
-                      {std.nis}
+                      {currentMode === 'kampus' ? (std.id === 'std-1' ? '18239012' : `182390${std.nis.slice(-2)}`) : std.nis}
                     </td>
 
                     {/* Student Name & Avatar */}
@@ -313,29 +328,34 @@ export default function SchoolTreasury({ onTriggerNotification }) {
                       </div>
                     </td>
 
-                    {/* Class */}
+                    {/* Prodi / Class */}
                     <td className="py-3.5 px-4">
                       <span className="bg-slate-100 text-slate-700 text-[11px] font-bold px-2.5 py-1 rounded-full border border-slate-200">
-                        {std.className}
+                        {currentMode === 'kampus'
+                          ? (std.className.includes('IPA 2') ? 'Sistem Informasi' : std.className.includes('IPS') ? 'Manajemen' : 'Kedokteran Gigi')
+                          : std.className}
                       </span>
                     </td>
 
-                    {/* Parent Name & Phone */}
+                    {/* Fakultas / Parent Name */}
                     <td className="py-3.5 px-4">
-                      <span className="text-slate-800 font-semibold block">{std.parentName}</span>
+                      <span className="text-slate-800 font-semibold block">
+                        {currentMode === 'kampus' ? (std.className.includes('IPA 2') ? 'Fakultas Sains & Teknologi' : 'Fakultas Ekonomi & Bisnis') : std.parentName}
+                      </span>
                       <span className="text-[10px] text-slate-400 block">{std.parentPhone}</span>
                     </td>
 
-                    {/* SPP Amount */}
+                    {/* UKT / SPP Amount */}
                     <td className="py-3.5 px-4 font-extrabold text-slate-900">
-                      Rp {std.sppAmount.toLocaleString('id-ID')}
+                      Rp {currentMode === 'kampus' ? (std.id === 'std-1' ? (6500000).toLocaleString('id-ID') : (7500000).toLocaleString('id-ID')) : std.sppAmount.toLocaleString('id-ID')}
                     </td>
 
                     {/* Status Badge */}
                     <td className="py-3.5 px-4">
                       {std.status === 'LUNAS' ? (
                         <span className="bg-emerald-500 text-white font-extrabold text-[11px] px-3 py-1 rounded-full inline-flex items-center gap-1 shadow-2xs">
-                          <CheckCircle2 className="w-3.5 h-3.5" /> LUNAS
+                          <CheckCircle2 className="w-3.5 h-3.5" />
+                          {currentMode === 'kampus' ? 'LUNAS via SPC H2H' : 'LUNAS'}
                         </span>
                       ) : (
                         <span className="bg-amber-500 text-slate-950 font-extrabold text-[11px] px-3 py-1 rounded-full inline-flex items-center gap-1 shadow-2xs">
@@ -346,24 +366,43 @@ export default function SchoolTreasury({ onTriggerNotification }) {
 
                     {/* Payment Method & Date */}
                     <td className="py-3.5 px-4">
-                      <span className="font-semibold text-slate-700 block">{std.paymentMethod}</span>
+                      <span className="font-semibold text-slate-700 block">
+                        {currentMode === 'kampus' ? (std.status === 'LUNAS' ? 'wondr Autodebit BNI' : '-') : std.paymentMethod}
+                      </span>
                       <span className="text-[10px] text-slate-400 block">{std.paidAt}</span>
                     </td>
 
-                    {/* Action Button */}
+                    {/* Action Buttons */}
                     <td className="py-3.5 px-4 text-right">
-                      {std.status === 'MENUNGGAK' ? (
-                        <button
-                          onClick={() => handleOpenReminderModal(std)}
-                          className="bg-[#003B46] hover:bg-[#005E6A] text-white px-3.5 py-2 rounded-xl text-xs font-bold inline-flex items-center gap-1.5 shadow-xs active:scale-95 transition-all"
-                        >
-                          <Send className="w-3.5 h-3.5 text-[#72DFD0]" />
-                          Kirim Remind SPP
-                        </button>
+                      {currentMode === 'kampus' ? (
+                        std.status === 'LUNAS' ? (
+                          <button
+                            onClick={() => onTriggerNotification(`🎓 BNI API Notice: Beasiswa BNI Rp 2.500.000 berhasil disalurkan ke rekening ${std.name}`)}
+                            className="bg-[#00897B] hover:bg-teal-700 text-white px-3 py-1.5 rounded-xl text-xs font-bold inline-flex items-center gap-1 shadow-xs transition-all active:scale-95"
+                          >
+                            <Zap className="w-3.5 h-3.5 text-[#72DFD0]" /> Disburse Beasiswa
+                          </button>
+                        ) : (
+                          <button
+                            onClick={() => handleOpenReminderModal(std)}
+                            className="bg-[#003B46] hover:bg-[#005E6A] text-white px-3.5 py-1.5 rounded-xl text-xs font-bold inline-flex items-center gap-1.5 shadow-xs active:scale-95 transition-all"
+                          >
+                            <Send className="w-3.5 h-3.5 text-[#72DFD0]" /> Remind UKT
+                          </button>
+                        )
                       ) : (
-                        <span className="text-xs text-emerald-600 font-bold bg-emerald-50 px-2.5 py-1 rounded-lg border border-emerald-100 inline-flex items-center gap-1">
-                          <Check className="w-3.5 h-3.5" /> Terverifikasi API
-                        </span>
+                        std.status === 'MENUNGGAK' ? (
+                          <button
+                            onClick={() => handleOpenReminderModal(std)}
+                            className="bg-[#003B46] hover:bg-[#005E6A] text-white px-3.5 py-2 rounded-xl text-xs font-bold inline-flex items-center gap-1.5 shadow-xs active:scale-95 transition-all"
+                          >
+                            <Send className="w-3.5 h-3.5 text-[#72DFD0]" /> Kirim Remind SPP
+                          </button>
+                        ) : (
+                          <span className="text-xs text-emerald-600 font-bold bg-emerald-50 px-2.5 py-1 rounded-lg border border-emerald-100 inline-flex items-center gap-1">
+                            <Check className="w-3.5 h-3.5" /> Terverifikasi API
+                          </span>
+                        )
                       )}
                     </td>
 

@@ -21,6 +21,7 @@ import {
 import { canteenMenuItems, merchantInfo } from '../dummyData';
 
 export default function MerchantKantin({
+  currentMode = 'sekolah',
   studentsData,
   selectedStudentId,
   onSelectStudent,
@@ -116,37 +117,32 @@ export default function MerchantKantin({
     setTapResult(null);
   };
 
-  // Simulate TAP Kartu Siswa (Akbar or Aisha)
+  // Simulate NFC TAP Card Process
   const handleSimulateTap = (studentId) => {
-    const student = studentsData[studentId];
-    if (!student) return;
-
+    onSelectStudent(studentId);
     setIsScanning(true);
     setTapResult(null);
 
-    // Simulate 600ms NFC reading animation
     setTimeout(() => {
       setIsScanning(false);
-      onSelectStudent(studentId);
+      const student = studentsData[studentId];
+      const remainingAllowance = student.dailyLimit - student.spentToday;
 
-      const remainingAllowance = Math.max(0, student.dailyLimit - student.spentToday);
-
-      // Validation logic: Total <= Remaining Allowance
-      if (cartTotal <= remainingAllowance) {
-        const updatedSpent = student.spentToday + cartTotal;
-        const newRemaining = student.dailyLimit - updatedSpent;
+      if (remainingAllowance >= cartTotal) {
+        // Success Checkout
+        const newSpent = student.spentToday + cartTotal;
+        const newRemaining = student.dailyLimit - newSpent;
         const itemsSummary = cartItems.map((i) => `${i.name} (${i.quantity}x)`).join(', ');
-        const trxId = `TRX-BNI-ED-${Math.floor(10000 + Math.random() * 90000)}`;
+        const trxId = 'TRX-BNI-' + Math.floor(100000 + Math.random() * 900000);
 
-        // Process global state update
         onProcessTransaction({
-          studentId: student.id,
+          studentId,
           amount: cartTotal,
           itemSummary: itemsSummary,
-          cartItems: cartItems
+          cartItems
         });
 
-        // Trigger real-time notification to parent app
+        // Push real-time notification
         onTriggerNotification(
           `🔔 Transaksi Kantin: ${student.name} baru saja membeli ${itemsSummary} (Rp ${cartTotal.toLocaleString('id-ID')})`
         );
@@ -189,9 +185,15 @@ export default function MerchantKantin({
           </div>
           <div>
             <div className="flex items-center gap-2">
-              <h2 className="font-extrabold text-xs tracking-tight text-white">{merchantInfo.name}</h2>
-              <span className="bg-emerald-500/20 text-emerald-400 font-bold text-[9px] px-1.5 py-0.2 rounded border border-emerald-500/30">
-                POS Online
+              <h2 className="font-extrabold text-xs tracking-tight text-white">
+                {currentMode === 'kampus' ? 'POS Juragan Merchant - Kantin Pusat Kampus B Unair' : merchantInfo.name}
+              </h2>
+              <span className={`font-bold text-[9px] px-2 py-0.5 rounded-full flex items-center gap-1 ${
+                currentMode === 'kampus'
+                  ? 'bg-gradient-to-r from-emerald-400 to-teal-400 text-slate-950 font-extrabold shadow-sm'
+                  : 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30'
+              }`}>
+                {currentMode === 'kampus' ? '⚡ Settlement Instan H+0 ke Rekening BNI Juragan' : 'POS Online'}
               </span>
             </div>
             <p className="text-[10px] text-slate-400 font-medium flex items-center gap-1.5 mt-0.5">
@@ -213,7 +215,8 @@ export default function MerchantKantin({
         <div className="space-y-2">
           <div className="flex items-center justify-between">
             <h3 className="font-extrabold text-slate-900 text-sm flex items-center gap-2">
-              <Utensils className="w-4 h-4 text-[#F37021]" /> Menu Kantin SMAN 1 Surabaya
+              <Utensils className="w-4 h-4 text-[#F37021]" />
+              {currentMode === 'kampus' ? 'Menu Kantin Pusat Kampus B Unair' : 'Menu Kantin SMAN 1 Surabaya'}
             </h3>
             <span className="text-[10px] text-slate-500 font-semibold">Pilih menu di bawah</span>
           </div>
@@ -405,12 +408,12 @@ export default function MerchantKantin({
               <div className="space-y-3">
                 <div className="bg-slate-50 p-3.5 rounded-2xl border border-slate-100 text-center">
                   <p className="text-xs text-slate-600 font-medium">
-                    Simulasikan penempelan Kartu Siswa pada mesin kasir:
+                    {currentMode === 'kampus' ? 'Pilih simulasikan metode pembayaran POS Kantin Kampus:' : 'Simulasikan penempelan Kartu Siswa pada mesin kasir:'}
                   </p>
                 </div>
 
                 <div className="space-y-2">
-                  {/* Akbar Tap Button */}
+                  {/* Akbar / Kampus QRIS wondr & Tap KTM Button */}
                   <button
                     onClick={() => handleSimulateTap('akbar')}
                     className="w-full p-3 bg-white hover:bg-slate-50 border-2 border-slate-200 hover:border-[#F37021] rounded-2xl flex items-center justify-between text-left transition-all group shadow-xs"
@@ -425,16 +428,16 @@ export default function MerchantKantin({
                         <div className="flex items-center gap-1.5">
                           <h4 className="font-extrabold text-xs text-slate-900">{studentsData.akbar?.name}</h4>
                           <span className="bg-slate-100 text-slate-700 text-[9px] font-bold px-1.5 rounded">
-                            {studentsData.akbar?.grade}
+                            {currentMode === 'kampus' ? 'Mahasiswa Unair' : studentsData.akbar?.grade}
                           </span>
                         </div>
                         <p className="text-[10px] text-slate-500">
-                          Sisa Pagu: <strong className="text-[#00897B] font-bold">Rp {Math.max(0, studentsData.akbar.dailyLimit - studentsData.akbar.spentToday).toLocaleString('id-ID')}</strong>
+                          {currentMode === 'kampus' ? 'KTM Co-Brand BNI' : 'Sisa Pagu'}: <strong className="text-[#00897B] font-bold">Rp {Math.max(0, studentsData.akbar.dailyLimit - studentsData.akbar.spentToday).toLocaleString('id-ID')}</strong>
                         </p>
                       </div>
                     </div>
                     <span className="bg-[#F37021] text-white text-[10px] font-bold px-2.5 py-1 rounded-xl shadow-xs group-hover:scale-105 transition-transform flex items-center gap-1">
-                      <CreditCard className="w-3 h-3" /> TAP Kartu Akbar
+                      <CreditCard className="w-3 h-3" /> {currentMode === 'kampus' ? '📱 QRIS / 💳 Tap KTM' : 'TAP Kartu Akbar'}
                     </span>
                   </button>
 

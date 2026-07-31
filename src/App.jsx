@@ -45,6 +45,9 @@ export default function App() {
   // Top Level Mode: 'parent' (Screen 1 & 2) | 'merchant' (Screen 3 POS) | 'treasury' (Screen 4 B2B Portal)
   const [appMode, setAppMode] = useState('parent');
 
+  // Active Mode Ecosystem: 'sekolah' (K-12) | 'kampus' (University)
+  const [currentMode, setCurrentMode] = useState('sekolah');
+
   // Screen inside Parent Mode: 'home' (Screen 1) | 'education' (Screen 2)
   const [currentScreen, setCurrentScreen] = useState('home');
   const [activeTab, setActiveTab] = useState('transaksi');
@@ -138,62 +141,94 @@ export default function App() {
           </div>
         </div>
 
-        {/* MODE SWITCHER BUTTONS (4 Screens Access) */}
-        <div className="flex items-center gap-1.5 bg-slate-800/90 backdrop-blur-md p-1.5 rounded-2xl border border-slate-700/60 shadow-xl">
-          <button
-            onClick={() => { setAppMode('parent'); setCurrentScreen('home'); }}
-            className={`px-3.5 py-2 rounded-xl font-bold text-xs transition-all flex items-center gap-1.5 ${
-              appMode === 'parent' && currentScreen === 'home'
-                ? 'bg-[#72DFD0] text-slate-950 shadow-md'
-                : 'text-slate-300 hover:text-white'
-            }`}
-          >
-            <Smartphone className="w-4 h-4" />
-            Screen 1: Home
-          </button>
+        {/* TOP NAVBAR SIMULATOR TOGGLE: Mode Sekolah vs Mode Kampus */}
+        <div className="flex items-center gap-3">
+          <div className="flex items-center bg-slate-800/90 backdrop-blur-md p-1.5 rounded-2xl border border-slate-700/60 shadow-xl gap-1">
+            <button
+              onClick={() => {
+                setCurrentMode('sekolah');
+                triggerToast('Mode Aktif: Mode Sekolah (K-12)');
+              }}
+              className={`px-3 py-1.5 rounded-xl font-bold text-xs transition-all flex items-center gap-1.5 ${
+                currentMode === 'sekolah'
+                  ? 'bg-[#72DFD0] text-slate-950 shadow-md font-extrabold'
+                  : 'text-slate-400 hover:text-white'
+              }`}
+            >
+              🎒 Mode Sekolah (K-12)
+            </button>
+            <button
+              onClick={() => {
+                setCurrentMode('kampus');
+                triggerToast('Mode Aktif: Mode Kampus (University)');
+              }}
+              className={`px-3 py-1.5 rounded-xl font-bold text-xs transition-all flex items-center gap-1.5 ${
+                currentMode === 'kampus'
+                  ? 'bg-[#72DFD0] text-slate-950 shadow-md font-extrabold'
+                  : 'text-slate-400 hover:text-white'
+              }`}
+            >
+              🎓 Mode Kampus (University)
+            </button>
+          </div>
 
-          <button
-            onClick={() => { setAppMode('parent'); setCurrentScreen('education'); }}
-            className={`px-3.5 py-2 rounded-xl font-bold text-xs transition-all flex items-center gap-1.5 ${
-              appMode === 'parent' && currentScreen === 'education'
-                ? 'bg-[#72DFD0] text-slate-950 shadow-md'
-                : 'text-slate-300 hover:text-white'
-            }`}
-          >
-            <GraduationCap className="w-4 h-4" />
-            Screen 2: Parent Hub
-          </button>
+          {/* MODE SWITCHER BUTTONS (4 Screens Access) */}
+          <div className="flex items-center gap-1.5 bg-slate-800/90 backdrop-blur-md p-1.5 rounded-2xl border border-slate-700/60 shadow-xl">
+            <button
+              onClick={() => { setAppMode('parent'); setCurrentScreen('home'); }}
+              className={`px-3 py-2 rounded-xl font-bold text-xs transition-all flex items-center gap-1.5 ${
+                appMode === 'parent' && currentScreen === 'home'
+                  ? 'bg-[#72DFD0] text-slate-950 shadow-md'
+                  : 'text-slate-300 hover:text-white'
+              }`}
+            >
+              <Smartphone className="w-4 h-4" />
+              Screen 1: Home
+            </button>
 
-          <button
-            onClick={() => setAppMode('merchant')}
-            className={`px-3.5 py-2 rounded-xl font-extrabold text-xs transition-all flex items-center gap-1.5 ${
-              appMode === 'merchant'
-                ? 'bg-gradient-to-r from-[#FF7A00] to-[#F37021] text-white shadow-lg shadow-[#F37021]/30'
-                : 'text-slate-300 hover:text-white'
-            }`}
-          >
-            <Store className="w-4 h-4 text-amber-300" />
-            Screen 3: POS Kantin
-          </button>
+            <button
+              onClick={() => { setAppMode('parent'); setCurrentScreen('education'); }}
+              className={`px-3 py-2 rounded-xl font-bold text-xs transition-all flex items-center gap-1.5 ${
+                appMode === 'parent' && currentScreen === 'education'
+                  ? 'bg-[#72DFD0] text-slate-950 shadow-md'
+                  : 'text-slate-300 hover:text-white'
+              }`}
+            >
+              <GraduationCap className="w-4 h-4" />
+              {currentMode === 'kampus' ? 'Screen 2: Student Hub' : 'Screen 2: Parent Hub'}
+            </button>
 
-          <button
-            onClick={() => setAppMode('treasury')}
-            className={`px-3.5 py-2 rounded-xl font-extrabold text-xs transition-all flex items-center gap-1.5 ${
-              appMode === 'treasury'
-                ? 'bg-[#005E6A] text-white shadow-lg shadow-[#005E6A]/40 ring-1 ring-teal-400'
-                : 'text-slate-300 hover:text-white'
-            }`}
-          >
-            <Building2 className="w-4 h-4 text-[#72DFD0]" />
-            Screen 4: Portal Sekolah (Full Desktop)
-          </button>
+            <button
+              onClick={() => setAppMode('merchant')}
+              className={`px-3 py-2 rounded-xl font-extrabold text-xs transition-all flex items-center gap-1.5 ${
+                appMode === 'merchant'
+                  ? 'bg-gradient-to-r from-[#FF7A00] to-[#F37021] text-white shadow-lg shadow-[#F37021]/30'
+                  : 'text-slate-300 hover:text-white'
+              }`}
+            >
+              <Store className="w-4 h-4 text-amber-300" />
+              Screen 3: POS Kantin
+            </button>
+
+            <button
+              onClick={() => setAppMode('treasury')}
+              className={`px-3 py-2 rounded-xl font-extrabold text-xs transition-all flex items-center gap-1.5 ${
+                appMode === 'treasury'
+                  ? 'bg-[#005E6A] text-white shadow-lg shadow-[#005E6A]/40 ring-1 ring-teal-400'
+                  : 'text-slate-300 hover:text-white'
+              }`}
+            >
+              <Building2 className="w-4 h-4 text-[#72DFD0]" />
+              Screen 4: Portal B2B
+            </button>
+          </div>
         </div>
       </div>
 
       {/* SCREEN 4: FULL DESKTOP B2B SCHOOL PORTAL (Renders 100% width, outside mobile frame) */}
       {appMode === 'treasury' ? (
         <div className="w-full max-w-7xl animate-in fade-in duration-300">
-          <SchoolTreasury onTriggerNotification={triggerPushNotification} />
+          <SchoolTreasury currentMode={currentMode} onTriggerNotification={triggerPushNotification} />
         </div>
       ) : (
         /* SCREEN 1, 2, 3: MOBILE PHONE FRAME CONTAINER */
@@ -331,21 +366,54 @@ export default function App() {
               </div>
 
               {/* Header Mode Switcher Pill */}
-              <div className="bg-slate-900 px-4 py-2 flex items-center justify-between text-xs border-b border-slate-800 shrink-0 z-30">
-                <div className="flex items-center gap-1.5 text-white font-bold">
-                  {appMode === 'parent' && <><Smartphone className="w-3.5 h-3.5 text-[#72DFD0]" /> Mode Orang Tua</>}
-                  {appMode === 'merchant' && <><Store className="w-3.5 h-3.5 text-amber-400" /> Mode Kasir POS</>}
+              <div className="bg-slate-900 px-3.5 py-2 flex items-center justify-between text-xs border-b border-slate-800 shrink-0 z-30">
+                <div className="flex items-center gap-1 bg-slate-800/90 p-0.5 rounded-xl border border-slate-700">
+                  <button
+                    onClick={() => {
+                      setCurrentMode('sekolah');
+                      triggerToast('Mode Aktif: Mode Sekolah (K-12)');
+                    }}
+                    className={`px-2.5 py-1 rounded-lg text-[10px] font-extrabold transition-all ${
+                      currentMode === 'sekolah'
+                        ? 'bg-[#72DFD0] text-slate-950 shadow-xs'
+                        : 'text-slate-400 hover:text-white'
+                    }`}
+                  >
+                    🎒 Sekolah (K-12)
+                  </button>
+                  <button
+                    onClick={() => {
+                      setCurrentMode('kampus');
+                      triggerToast('Mode Aktif: Mode Kampus (University)');
+                    }}
+                    className={`px-2.5 py-1 rounded-lg text-[10px] font-extrabold transition-all ${
+                      currentMode === 'kampus'
+                        ? 'bg-[#72DFD0] text-slate-950 shadow-xs'
+                        : 'text-slate-400 hover:text-white'
+                    }`}
+                  >
+                    🎓 Kampus (Univ)
+                  </button>
                 </div>
 
-                <button
-                  onClick={() => {
-                    if (appMode === 'parent') setAppMode('merchant');
-                    else { setAppMode('parent'); setCurrentScreen('education'); }
-                  }}
-                  className="bg-slate-800 hover:bg-slate-700 text-[#72DFD0] px-2.5 py-1 rounded-xl text-[10px] font-extrabold flex items-center gap-1 border border-slate-700 transition-colors"
-                >
-                  <ArrowRightLeft className="w-3 h-3" /> Ganti Mode
-                </button>
+                <div className="flex items-center gap-1.5 text-white text-[11px] font-bold">
+                  {appMode === 'parent' && (
+                    currentMode === 'kampus' ? (
+                      <span className="text-[#72DFD0] flex items-center gap-1">
+                        <GraduationCap className="w-3.5 h-3.5" /> Student Hub
+                      </span>
+                    ) : (
+                      <span className="text-[#72DFD0] flex items-center gap-1">
+                        <Smartphone className="w-3.5 h-3.5" /> Parent Hub
+                      </span>
+                    )
+                  )}
+                  {appMode === 'merchant' && (
+                    <span className="text-amber-400 flex items-center gap-1">
+                      <Store className="w-3.5 h-3.5" /> POS Kantin
+                    </span>
+                  )}
+                </div>
               </div>
 
               {/* PUSH NOTIFICATION BANNER */}
@@ -383,6 +451,7 @@ export default function App() {
                 {/* SCREEN 3: KASIR KANTIN POS ENGINE */}
                 {appMode === 'merchant' && (
                   <MerchantKantin
+                    currentMode={currentMode}
                     studentsData={studentsData}
                     selectedStudentId={selectedStudentId}
                     onSelectStudent={(id) => setSelectedStudentId(id)}
@@ -403,13 +472,17 @@ export default function App() {
                           <div className="flex items-center justify-between">
                             <div className="flex items-center gap-3">
                               <img
-                                src="https://i.pravatar.cc/150?img=32"
-                                alt="Karnisa"
+                                src={currentMode === 'kampus' ? student.avatar : "https://i.pravatar.cc/150?img=32"}
+                                alt={currentMode === 'kampus' ? "Akbar Putra" : "Karnisa"}
                                 className="w-10 h-10 rounded-full object-cover border-2 border-white shadow-xs"
                               />
                               <div>
-                                <p className="text-[11px] text-slate-500 font-medium">Selamat Pagi,</p>
-                                <h2 className="text-slate-900 font-extrabold text-base tracking-tight leading-tight">Hai, Karnisa!</h2>
+                                <p className="text-[11px] text-slate-500 font-medium">
+                                  {currentMode === 'kampus' ? 'Selamat Pagi, Akbar!' : 'Selamat Pagi,'}
+                                </p>
+                                <h2 className="text-slate-900 font-extrabold text-xs md:text-sm tracking-tight leading-tight">
+                                  {currentMode === 'kampus' ? 'Dashboard Keuangan Mahasiswa (Akbar - Unair)' : 'Hai, Karnisa!'}
+                                </h2>
                               </div>
                             </div>
 
@@ -474,20 +547,22 @@ export default function App() {
                           <div className="space-y-4">
                             <div>
                               <span className="text-[10px] tracking-wider uppercase bg-black/20 text-orange-100 font-semibold px-2 py-0.5 rounded-full border border-white/10">
-                                Utama
+                                {currentMode === 'kampus' ? 'KTM Co-Brand BNI Unair' : 'Utama'}
                               </span>
-                              <h3 className="font-extrabold text-base tracking-wide mt-1">BNI Taplus</h3>
+                              <h3 className="font-extrabold text-base tracking-wide mt-1">
+                                {currentMode === 'kampus' ? 'BNI Taplus Muda' : 'BNI Taplus'}
+                              </h3>
                             </div>
 
                             <div>
                               <div className="flex items-center gap-2 text-orange-100 text-xs font-medium">
-                                <span>Total Saldo</span>
+                                <span>Total Saldo Mahasiswa</span>
                                 <button onClick={() => setShowBalance(!showBalance)} className="hover:text-white">
                                   {showBalance ? <Eye className="w-3.5 h-3.5" /> : <EyeOff className="w-3.5 h-3.5" />}
                                 </button>
                               </div>
                               <p className="text-2xl font-black tracking-tight mt-0.5">
-                                {showBalance ? 'Rp2.800.000.000' : '••••••••••••'}
+                                {showBalance ? (currentMode === 'kampus' ? 'Rp4.850.000' : 'Rp2.800.000.000') : '••••••••••••'}
                               </p>
                             </div>
 
@@ -541,7 +616,7 @@ export default function App() {
                               <span className="text-xs font-semibold text-slate-700">E-Wallet</span>
                             </button>
 
-                            {/* Edukasi & Anak */}
+                            {/* Edukasi / Kampus Hub */}
                             <button
                               onClick={() => setCurrentScreen('education')}
                               className="flex flex-col items-center gap-2 group relative"
@@ -552,7 +627,9 @@ export default function App() {
                                   BARU
                                 </span>
                               </div>
-                              <span className="text-xs font-bold text-slate-900">Edukasi & Anak</span>
+                              <span className="text-xs font-bold text-slate-900">
+                                {currentMode === 'kampus' ? 'Campus Hub' : 'Edukasi & Anak'}
+                              </span>
                             </button>
 
                             <button className="flex flex-col items-center gap-2 group">
@@ -575,10 +652,16 @@ export default function App() {
                             </div>
                             <div>
                               <div className="flex items-center gap-2">
-                                <span className="text-white font-bold text-xs">wondr Education Hub</span>
+                                <span className="text-white font-bold text-xs">
+                                  {currentMode === 'kampus' ? 'wondr Campus Hub' : 'wondr Education Hub'}
+                                </span>
                                 <span className="text-[10px] bg-[#D4F933] text-slate-950 font-bold px-1.5 rounded">Baru</span>
                               </div>
-                              <p className="text-[11px] text-slate-300 mt-0.5">SPP Lunas & Sisa Pagu {student.name}: Rp {(student.dailyLimit - student.spentToday).toLocaleString('id-ID')}</p>
+                              <p className="text-[11px] text-slate-300 mt-0.5">
+                                {currentMode === 'kampus'
+                                  ? `UKT Semester 5 Lunas • Rp 6.500.000 [LUNAS via wondr]`
+                                  : `SPP Lunas • Sisa Pagu ${student.name.split(' ')[0]}: Rp ${(student.dailyLimit - student.spentToday).toLocaleString('id-ID')}`}
+                              </p>
                             </div>
                           </div>
                           <ChevronRight className="w-5 h-5 text-slate-400" />
@@ -600,7 +683,9 @@ export default function App() {
                                   </div>
                                   <div>
                                     <p className="font-bold text-slate-900">{item.title}</p>
-                                    <p className="text-[10px] text-slate-500">{item.time} • QRIS BNI Junior</p>
+                                    <p className="text-[10px] text-slate-500">
+                                      {item.time} • {currentMode === 'kampus' ? 'KTM BNI Co-Brand' : 'QRIS BNI Junior'}
+                                    </p>
                                   </div>
                                 </div>
                                 <span className="font-bold text-slate-900">-Rp {item.price.toLocaleString('id-ID')}</span>
@@ -612,7 +697,7 @@ export default function App() {
                       </div>
                     )}
 
-                    {/* SCREEN 2: PARENT CONTROL HUB (Simplified - Category Locker Removed) */}
+                    {/* SCREEN 2: PARENT CONTROL HUB vs STUDENT HUB */}
                     {currentScreen === 'education' && (
                       <div className="p-4 space-y-4 pb-24 animate-in fade-in duration-300">
                         
@@ -627,15 +712,19 @@ export default function App() {
                             </button>
                             <div>
                               <div className="flex items-center gap-1.5">
-                                <h2 className="text-slate-900 font-extrabold text-base">wondr for Education</h2>
+                                <h2 className="text-slate-900 font-extrabold text-base">
+                                  {currentMode === 'kampus' ? 'Dashboard Keuangan Mahasiswa (Akbar - Unair)' : 'wondr for Education'}
+                                </h2>
                                 <img src="/assets/wondr-logo.png" alt="wondr logo" className="h-3.5 object-contain" />
                               </div>
-                              <p className="text-[10px] text-slate-500 font-semibold">Hub Kontrol Orang Tua & Keuangan Sekolah</p>
+                              <p className="text-[10px] text-slate-500 font-semibold">
+                                {currentMode === 'kampus' ? 'Student Financial Autonomy & B2B2C Campus Treasury' : 'Hub Kontrol Orang Tua & Keuangan Sekolah'}
+                              </p>
                             </div>
                           </div>
                         </div>
 
-                        {/* Student Selector Card */}
+                        {/* Student Selector / Student Card */}
                         <div className="bg-white p-3.5 rounded-3xl border border-slate-200/80 shadow-xs flex items-center justify-between">
                           <div className="flex items-center gap-3">
                             <img
@@ -647,10 +736,12 @@ export default function App() {
                               <div className="flex items-center gap-1.5">
                                 <h3 className="font-extrabold text-slate-900 text-sm">{student.name}</h3>
                                 <span className="bg-slate-100 text-slate-700 text-[10px] font-semibold px-2 py-0.5 rounded-full border border-slate-200">
-                                  {student.grade}
+                                  {currentMode === 'kampus' ? 'Mahasiswa S1' : student.grade}
                                 </span>
                               </div>
-                              <p className="text-xs text-slate-500 font-medium">{student.school} • NIS {student.nis}</p>
+                              <p className="text-xs text-slate-500 font-medium">
+                                {currentMode === 'kampus' ? 'Sistem Informasi • Universitas Airlangga (NIM: 18239012)' : `${student.school} • NIS ${student.nis}`}
+                              </p>
                             </div>
                           </div>
 
@@ -662,34 +753,42 @@ export default function App() {
                           </button>
                         </div>
 
-                        {/* FEATURE 1: SPP Status */}
+                        {/* WIDGET 1: UKT+ Portal */}
                         <div className="bg-white rounded-3xl border border-slate-200/80 shadow-xs overflow-hidden">
                           <div className="bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900 p-3.5 text-white flex items-center justify-between">
                             <div className="flex items-center gap-2">
                               <div className="bg-[#72DFD0] text-slate-950 p-1.5 rounded-xl">
                                 <Receipt className="w-4 h-4" />
                               </div>
-                              <h3 className="font-bold text-xs tracking-wide">Status Pembayaran SPP</h3>
+                              <h3 className="font-bold text-xs tracking-wide">
+                                {currentMode === 'kampus' ? 'UKT+ Portal (Host-to-Host BNI)' : 'Status Pembayaran SPP'}
+                              </h3>
                             </div>
-                            <span className="text-[10px] text-slate-300 font-medium">{student.sppPeriod}</span>
+                            <span className="text-[10px] text-[#72DFD0] font-bold">
+                              {currentMode === 'kampus' ? 'Semester 5 (2026/2027)' : student.sppPeriod}
+                            </span>
                           </div>
 
                           <div className="p-4 space-y-3.5">
                             <div className="flex items-center justify-between">
                               <div>
-                                <p className="text-[11px] text-slate-500 font-medium">Tagihan SPP Bulanan</p>
-                                <p className="text-xl font-extrabold text-slate-900">{student.sppAmount}</p>
+                                <p className="text-[11px] text-slate-500 font-medium">
+                                  {currentMode === 'kampus' ? 'Status UKT Semester 5' : 'Tagihan SPP Bulanan'}
+                                </p>
+                                <p className="text-xl font-extrabold text-slate-900">
+                                  {currentMode === 'kampus' ? 'Rp 6.500.000' : student.sppAmount}
+                                </p>
                               </div>
 
                               <div className="flex flex-col items-end gap-1">
                                 <span className="bg-emerald-500 text-white font-extrabold text-xs px-3 py-1 rounded-full flex items-center gap-1 shadow-xs">
                                   <CheckCircle2 className="w-3.5 h-3.5" />
-                                  {student.sppStatus}
+                                  {currentMode === 'kampus' ? 'LUNAS via wondr' : student.sppStatus}
                                 </span>
 
                                 <span className="bg-[#E6FBF8] text-[#00A396] font-bold text-[10px] px-2 py-0.5 rounded-full flex items-center gap-1 border border-[#72DFD0]/40">
                                   <RefreshCw className="w-3 h-3" />
-                                  Autodebit Aktif
+                                  {currentMode === 'kampus' ? 'Auto-Sync SPC H2H' : 'Autodebit Aktif'}
                                 </span>
                               </div>
                             </div>
@@ -699,12 +798,80 @@ export default function App() {
                               className="w-full bg-[#E6FBF8] hover:bg-[#72DFD0]/30 text-[#00897B] font-bold text-xs py-2.5 rounded-2xl flex items-center justify-center gap-2 border border-[#72DFD0]/40 transition-colors"
                             >
                               <Receipt className="w-4 h-4" />
-                              Lihat Bukti Bayar & Detail SPP
+                              {currentMode === 'kampus' ? 'Lihat Bukti Bayar UKT & Rincian SKS' : 'Lihat Bukti Bayar & Detail SPP'}
                             </button>
                           </div>
                         </div>
 
-                        {/* FEATURE 2: Pagu Jajan Kantin (Daily Allowance Slider & Usage Progress Bar) */}
+                        {/* WIDGET 2: Kas Komunitas Ormawa (Shared Treasury) */}
+                        {currentMode === 'kampus' && (
+                          <div className="bg-white p-4 rounded-3xl border border-slate-200/80 shadow-xs space-y-3">
+                            <div className="flex items-center justify-between">
+                              <div className="flex items-center gap-2">
+                                <div className="bg-teal-500 text-white p-1.5 rounded-xl">
+                                  <Building2 className="w-4 h-4" />
+                                </div>
+                                <div>
+                                  <h3 className="font-bold text-slate-900 text-sm">Kas Komunitas Ormawa</h3>
+                                  <p className="text-[10px] text-slate-500 font-medium">Shared Treasury (HIMA Sistem Informasi)</p>
+                                </div>
+                              </div>
+                              <span className="bg-emerald-500/10 text-emerald-700 border border-emerald-300 font-bold text-[9px] px-2 py-0.5 rounded-full">
+                                Dual-Approval Active
+                              </span>
+                            </div>
+
+                            <div className="bg-slate-50 p-3 rounded-2xl border border-slate-100 flex items-center justify-between">
+                              <div>
+                                <p className="text-[10px] text-slate-500 font-semibold">Kas Himpunan Sistem Informasi</p>
+                                <p className="text-lg font-black text-slate-900">Saldo: Rp 4.200.000</p>
+                              </div>
+                              <div className="text-right">
+                                <span className="text-[9px] font-extrabold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-md border border-emerald-200 block">
+                                  Approved by Ketua & Bendahara
+                                </span>
+                                <p className="text-[9px] text-slate-400 mt-0.5">Pengajuan: Rp 500.000 (LKMM)</p>
+                              </div>
+                            </div>
+
+                            <button
+                              onClick={() => triggerToast('✅ Dual-Approval OK! Dana Kas Himpunan Rp 500.000 disetujui via BNI Open API')}
+                              className="w-full bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs py-2.5 rounded-2xl flex items-center justify-center gap-2 shadow-xs transition-colors"
+                            >
+                              <CheckCircle2 className="w-4 h-4 text-[#72DFD0]" />
+                              Approve Pencairan Dana (Akbar - Bendahara 2)
+                            </button>
+                          </div>
+                        )}
+
+                        {/* WIDGET 3 (KAMPUS MODE ONLY): Aktivitas Kampus Quick Actions */}
+                        {currentMode === 'kampus' && (
+                          <div className="bg-white p-4 rounded-3xl border border-slate-200/80 shadow-xs space-y-3">
+                            <h3 className="font-bold text-slate-900 text-xs flex items-center gap-2">
+                              <Sparkles className="w-4 h-4 text-[#00A396]" /> Aktivitas & Transaksi Kampus
+                            </h3>
+
+                            <div className="grid grid-cols-2 gap-2">
+                              <button
+                                onClick={() => triggerToast('🤝 Fitur Split Bill wondr Siap!')}
+                                className="p-3 rounded-2xl bg-teal-50 hover:bg-teal-100/80 border border-teal-200 text-left transition-colors"
+                              >
+                                <span className="font-extrabold text-xs text-teal-900 block">🤝 Split Bill Nongkrong</span>
+                                <span className="text-[10px] text-teal-700 block mt-0.5">Patungan warkop / kafe</span>
+                              </button>
+
+                              <button
+                                onClick={() => triggerToast('💳 Top Up TapCash BNI Berhasil!')}
+                                className="p-3 rounded-2xl bg-orange-50 hover:bg-orange-100/80 border border-orange-200 text-left transition-colors"
+                              >
+                                <span className="font-extrabold text-xs text-orange-900 block">💳 Top Up KTM TapCash</span>
+                                <span className="text-[10px] text-orange-700 block mt-0.5">Saldo E-Money BNI</span>
+                              </button>
+                            </div>
+                          </div>
+                        )}
+
+                        {/* Pagu Mandiri Mahasiswa / Monthly Budgeting */}
                         <div className="bg-white p-4 rounded-3xl border border-slate-200/80 shadow-xs space-y-4">
                           <div className="flex items-center justify-between">
                             <div className="flex items-center gap-2">
@@ -712,15 +879,21 @@ export default function App() {
                                 <Utensils className="w-4 h-4" />
                               </div>
                               <div>
-                                <h3 className="font-bold text-slate-900 text-sm">Pagu Jajan Kantin</h3>
-                                <p className="text-[10px] text-slate-500 font-medium">Batas transaksi harian kartu jajan siswa</p>
+                                <h3 className="font-bold text-slate-900 text-sm">
+                                  {currentMode === 'kampus' ? 'Pagu Mandiri Mahasiswa / Monthly Budgeting' : 'Pagu Jajan Kantin'}
+                                </h3>
+                                <p className="text-[10px] text-slate-500 font-medium">
+                                  {currentMode === 'kampus' ? 'Alokasi anggaran bulanan mahasiswa mandiri (Akbar - Unair)' : 'Batas transaksi harian kartu jajan siswa'}
+                                </p>
                               </div>
                             </div>
                           </div>
 
                           <div className="space-y-2 bg-slate-50 p-3.5 rounded-2xl border border-slate-100">
                             <div className="flex items-center justify-between text-xs font-bold">
-                              <span className="text-slate-600">Terpakai Hari Ini</span>
+                              <span className="text-slate-600">
+                                {currentMode === 'kampus' ? 'Alokasi Terpakai Bulan Ini' : 'Terpakai Hari Ini'}
+                              </span>
                               <span className="text-slate-900 font-extrabold">
                                 Rp {student.spentToday.toLocaleString('id-ID')} / <span className="text-[#00A396]">Rp {student.dailyLimit.toLocaleString('id-ID')}</span>
                               </span>
@@ -741,31 +914,12 @@ export default function App() {
                             </div>
                           </div>
 
-                          {/* Today's Transactions History */}
-                          <div className="space-y-1.5">
-                            <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">
-                              Riwayat Transaksi Kantin Hari Ini
-                            </span>
-                            {student.canteenHistory.map((item) => (
-                              <div key={item.id} className="flex items-center justify-between text-xs p-2 rounded-xl bg-slate-50 border border-slate-100">
-                                <div className="flex items-center gap-2">
-                                  <Utensils className="w-3.5 h-3.5 text-[#00A396]" />
-                                  <span className="font-semibold text-slate-800">{item.title}</span>
-                                </div>
-                                <div className="text-right">
-                                  <span className="font-bold text-slate-900 block">-Rp {item.price.toLocaleString('id-ID')}</span>
-                                  <span className="text-[9px] text-slate-400 block">{item.time}</span>
-                                </div>
-                              </div>
-                            ))}
-                          </div>
-
                           {/* Interactive Allowance Limit Slider */}
                           <div className="space-y-3 pt-2 border-t border-slate-100">
                             <div className="flex items-center justify-between">
                               <label className="text-xs font-bold text-slate-900 flex items-center gap-1.5">
                                 <Sliders className="w-4 h-4 text-[#00A396]" />
-                                Atur Batas Pagu Harian
+                                {currentMode === 'kampus' ? 'Atur Pagu Bulanan Mandiri' : 'Atur Batas Pagu Harian'}
                               </label>
                               <span className="text-sm font-extrabold text-[#00A396] bg-[#E6FBF8] px-2.5 py-0.5 rounded-lg border border-[#72DFD0]/40">
                                 Rp {student.dailyLimit.toLocaleString('id-ID')}
@@ -794,7 +948,7 @@ export default function App() {
                                         dailyLimit: preset
                                       }
                                     }));
-                                    triggerToast(`Pagu harian diubah ke Rp ${preset.toLocaleString('id-ID')}`);
+                                    triggerToast(`Pagu diubah ke Rp ${preset.toLocaleString('id-ID')}`);
                                   }}
                                   className={`py-1 rounded-xl text-[11px] font-bold border transition-all ${
                                     student.dailyLimit === preset
@@ -809,7 +963,7 @@ export default function App() {
                           </div>
                         </div>
 
-                        {/* FEATURE 3: Reward Banner */}
+                        {/* FEATURE 4: Reward / Benefit Banner */}
                         <div
                           onClick={() => setShowKprModal(true)}
                           className="bg-gradient-to-br from-amber-500/10 via-amber-50 to-emerald-500/10 p-4 rounded-3xl border border-amber-300/60 shadow-xs cursor-pointer hover:border-amber-400"
@@ -819,9 +973,15 @@ export default function App() {
                               <Sparkles className="w-5 h-5 text-slate-950" />
                             </div>
                             <div className="space-y-1">
-                              <span className="text-amber-800 font-extrabold text-xs">🌟 Reward Kedisiplinan SPP</span>
+                              <span className="text-amber-800 font-extrabold text-xs">
+                                {currentMode === 'kampus' ? '🌟 Benefit Student BNI Co-Brand' : '🌟 Reward Kedisiplinan SPP'}
+                              </span>
                               <p className="text-xs text-slate-800 font-semibold leading-snug">
-                                Anda berhak mendapatkan <span className="text-[#00897B] font-bold underline">KPR Flexi BNI Bunga 2.75%</span> Pre-Approved!
+                                {currentMode === 'kampus' ? (
+                                  <>Dapatkan <span className="text-[#00897B] font-bold underline">Cashback 15% Merchant Kampus</span> & Beasiswa Talent BNI!</>
+                                ) : (
+                                  <>Anda berhak mendapatkan <span className="text-[#00897B] font-bold underline">KPR Flexi BNI Bunga 2.75%</span> Pre-Approved!</>
+                                )}
                               </p>
                             </div>
                           </div>
@@ -853,7 +1013,7 @@ export default function App() {
                   }`}
                 >
                   <GraduationCap className="w-5 h-5" />
-                  <span className="text-[10px] font-bold">Parent Hub</span>
+                  <span className="text-[10px] font-bold">{currentMode === 'kampus' ? 'Student Hub' : 'Parent Hub'}</span>
                 </button>
 
                 <div className="relative -top-5">
