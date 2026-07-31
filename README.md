@@ -1,5 +1,3 @@
-# wondr-education-prototype
-
 ====================================================================
            WONDR FOR EDUCATION - PROTOTYPE ECOSYSTEM
    Platform Keuangan Sekolah, POS Kantin & Portal B2B BNI Open API
