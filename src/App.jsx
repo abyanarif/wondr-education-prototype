@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import {
   Bell,
   Bookmark,
@@ -36,7 +36,8 @@ import {
   Check,
   Download,
   Share2,
-  Users
+  Users,
+  ChevronLeft
 } from 'lucide-react';
 
 import { initialStudentsData } from './dummyData';
@@ -69,6 +70,31 @@ export default function App() {
   const [showNotificationDrawer, setShowNotificationDrawer] = useState(false);
   const [showStudentSelectorSheet, setShowStudentSelectorSheet] = useState(false);
   const [activeCampusSheet, setActiveCampusSheet] = useState(null);
+
+  // Ref & Drag state for Promo Carousel
+  const promoCarouselRef = useRef(null);
+  const [isDraggingCarousel, setIsDraggingCarousel] = useState(false);
+  const [carouselStartX, setCarouselStartX] = useState(0);
+  const [carouselScrollLeft, setCarouselScrollLeft] = useState(0);
+
+  const handleCarouselMouseDown = (e) => {
+    if (!promoCarouselRef.current) return;
+    setIsDraggingCarousel(true);
+    setCarouselStartX(e.pageX - promoCarouselRef.current.offsetLeft);
+    setCarouselScrollLeft(promoCarouselRef.current.scrollLeft);
+  };
+
+  const handleCarouselMouseUp = () => {
+    setIsDraggingCarousel(false);
+  };
+
+  const handleCarouselMouseMove = (e) => {
+    if (!isDraggingCarousel || !promoCarouselRef.current) return;
+    e.preventDefault();
+    const x = e.pageX - promoCarouselRef.current.offsetLeft;
+    const walk = (x - carouselStartX) * 1.5;
+    promoCarouselRef.current.scrollLeft = carouselScrollLeft - walk;
+  };
 
   // Current active student object
   const student = studentsData[selectedStudentId] || studentsData.akbar;
@@ -892,19 +918,41 @@ export default function App() {
 
                             {/* SECTION 2: CAROUSEL BANNER HORIZONTAL (Fitur Pilihan & Promo) */}
                             {currentMode === 'kampus' && (
-                              <div className="space-y-2">
+                              <div className="space-y-2 pt-1">
                                 <div className="flex items-center justify-between px-1">
                                   <h3 className="font-bold text-slate-900 text-xs flex items-center gap-1.5">
                                     <Sparkles className="w-4 h-4 text-amber-500" />
                                     Fitur Pilihan & Promo
                                   </h3>
-                                  <span className="text-[10px] text-[#00A396] font-semibold">Geser ke kanan →</span>
+                                  <div className="flex items-center gap-1">
+                                    <button
+                                      onClick={() => promoCarouselRef.current?.scrollBy({ left: -240, behavior: 'smooth' })}
+                                      className="p-1 text-slate-400 hover:text-slate-700 rounded-md bg-slate-100 hover:bg-slate-200 transition-colors"
+                                      title="Geser Kiri"
+                                    >
+                                      <ChevronLeft className="w-3.5 h-3.5" />
+                                    </button>
+                                    <button
+                                      onClick={() => promoCarouselRef.current?.scrollBy({ left: 240, behavior: 'smooth' })}
+                                      className="px-2 py-0.5 text-[10px] text-[#00A396] hover:text-teal-700 font-bold rounded-md bg-teal-50 hover:bg-teal-100 transition-colors flex items-center gap-0.5"
+                                    >
+                                      Geser ke kanan →
+                                    </button>
+                                  </div>
                                 </div>
 
-                                <div className="flex items-stretch gap-3 overflow-x-auto no-scrollbar pb-1 snap-x">
+                                <div
+                                  ref={promoCarouselRef}
+                                  onMouseDown={handleCarouselMouseDown}
+                                  onMouseLeave={handleCarouselMouseUp}
+                                  onMouseUp={handleCarouselMouseUp}
+                                  onMouseMove={handleCarouselMouseMove}
+                                  style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
+                                  className="flex items-stretch gap-3 overflow-x-auto snap-x snap-mandatory no-scrollbar pb-2 pt-1 px-0.5 cursor-grab active:cursor-grabbing select-none"
+                                >
                                   
                                   {/* Card 1 Carousel: Nabung 26-Minggu */}
-                                  <div className="min-w-[270px] max-w-[280px] snap-start bg-gradient-to-br from-amber-500/10 via-amber-50 to-emerald-500/10 p-3.5 rounded-2xl border border-amber-300/80 shadow-xs space-y-2 shrink-0 flex flex-col justify-between">
+                                  <div className="w-[85%] min-w-[275px] max-w-[285px] snap-center bg-gradient-to-br from-amber-500/10 via-amber-50 to-emerald-500/10 p-3.5 rounded-2xl border border-amber-300/80 shadow-xs space-y-2 shrink-0 flex flex-col justify-between">
                                     <div className="flex items-center justify-between">
                                       <div className="flex items-center gap-1.5">
                                         <Trophy className="w-4 h-4 text-amber-600" />
@@ -927,7 +975,10 @@ export default function App() {
                                     </div>
 
                                     <button
-                                      onClick={() => triggerToast('🔥 Deposit Minggu ke-5 (Rp 100.000) Berhasil! Streak Nabung Bertambah!')}
+                                      onClick={(e) => {
+                                        e.stopPropagation();
+                                        triggerToast('🔥 Deposit Minggu ke-5 (Rp 100.000) Berhasil! Streak Nabung Bertambah!');
+                                      }}
                                       className="w-full bg-amber-500 hover:bg-amber-600 text-slate-950 font-extrabold text-xs py-1.5 rounded-xl flex items-center justify-center gap-1.5 shadow-xs transition-colors"
                                     >
                                       <Trophy className="w-3.5 h-3.5" /> Setor Wk 5 (Rp 100.000)
@@ -935,7 +986,7 @@ export default function App() {
                                   </div>
 
                                   {/* Card 2 Carousel: Benefit Student BNI Co-Brand */}
-                                  <div className="min-w-[270px] max-w-[280px] snap-start bg-gradient-to-br from-emerald-900 via-teal-900 to-slate-900 text-white p-3.5 rounded-2xl border border-emerald-500/40 shadow-xs space-y-2 shrink-0 flex flex-col justify-between">
+                                  <div className="w-[85%] min-w-[275px] max-w-[285px] snap-center bg-gradient-to-br from-emerald-900 via-teal-900 to-slate-900 text-white p-3.5 rounded-2xl border border-emerald-500/40 shadow-xs space-y-2 shrink-0 flex flex-col justify-between">
                                     <div className="flex items-center justify-between">
                                       <div className="flex items-center gap-1.5">
                                         <Sparkles className="w-4 h-4 text-[#D4F933]" />
@@ -949,7 +1000,10 @@ export default function App() {
                                     </p>
 
                                     <button
-                                      onClick={() => triggerToast('🌟 Promo Cashback 15% Merchant Kampus Diaktifkan!')}
+                                      onClick={(e) => {
+                                        e.stopPropagation();
+                                        triggerToast('🌟 Promo Cashback 15% Merchant Kampus Diaktifkan!');
+                                      }}
                                       className="w-full bg-[#72DFD0] hover:bg-[#00B4A2] text-slate-950 font-extrabold text-xs py-1.5 rounded-xl flex items-center justify-center gap-1.5 shadow-xs transition-colors"
                                     >
                                       Klaim Promo Cashback
