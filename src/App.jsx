@@ -35,7 +35,8 @@ import {
   ArrowLeftRight,
   Check,
   Download,
-  Share2
+  Share2,
+  Users
 } from 'lucide-react';
 
 import { initialStudentsData } from './dummyData';
@@ -55,7 +56,7 @@ export default function App() {
 
   // Screen inside Parent Mode: 'home' (Screen 1) | 'education' (Screen 2)
   const [currentScreen, setCurrentScreen] = useState('home');
-  const [activeTab, setActiveTab] = useState('transaksi');
+  const [activeTab, setActiveTab] = useState('home');
   const [showBalance, setShowBalance] = useState(true);
 
   // Live Toast & Push Notification System
@@ -67,6 +68,7 @@ export default function App() {
   const [showKprModal, setShowKprModal] = useState(false);
   const [showNotificationDrawer, setShowNotificationDrawer] = useState(false);
   const [showStudentSelectorSheet, setShowStudentSelectorSheet] = useState(false);
+  const [activeCampusSheet, setActiveCampusSheet] = useState(null);
 
   // Current active student object
   const student = studentsData[selectedStudentId] || studentsData.akbar;
@@ -652,9 +654,9 @@ export default function App() {
 
                     {/* SCREEN 2: PARENT CONTROL HUB vs STUDENT HUB */}
                     {currentScreen === 'education' && (
-                      <div className="p-3.5 space-y-3 pb-24 animate-in fade-in duration-300">
+                      <div className="p-3.5 space-y-3.5 pb-24 animate-in fade-in duration-300">
                         
-                        {/* Screen Header */}
+                        {/* Screen Top Navigation Header */}
                         <div className="flex items-center justify-between">
                           <div className="flex items-center gap-2">
                             <button
@@ -677,7 +679,7 @@ export default function App() {
                           </div>
                         </div>
 
-                        {/* Student Selector Card & Sleek Tier Status Badge */}
+                        {/* Student Profile Selector Card */}
                         <div className="bg-white p-3 rounded-2xl border border-slate-200/80 shadow-xs space-y-2">
                           <div className="flex items-center justify-between">
                             <div className="flex items-center gap-2.5">
@@ -707,7 +709,6 @@ export default function App() {
                             </button>
                           </div>
 
-                          {/* Sleek Single-Line Tier Badge for Kampus Mode */}
                           {currentMode === 'kampus' && (
                             <div className="bg-gradient-to-r from-emerald-950 via-teal-950 to-slate-950 text-white px-2.5 py-1 rounded-xl border border-emerald-500/40 shadow-xs flex items-center justify-between text-xs">
                               <span className="font-extrabold text-[#72DFD0] text-[11px] flex items-center gap-1">
@@ -718,306 +719,492 @@ export default function App() {
                           )}
                         </div>
 
-                        {/* WIDGET 1: UKT+ Portal (Prominently Placed Below Profile) */}
-                        <div className="bg-white rounded-2xl border border-slate-200/80 shadow-xs overflow-hidden">
-                          <div className="bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900 p-3 text-white flex items-center justify-between">
-                            <div className="flex items-center gap-2">
-                              <div className="bg-[#72DFD0] text-slate-950 p-1 rounded-lg">
-                                <Receipt className="w-3.5 h-3.5" />
-                              </div>
-                              <h3 className="font-bold text-xs tracking-wide">
-                                {currentMode === 'kampus' ? 'UKT+ Portal (Host-to-Host BNI)' : 'Status Pembayaran SPP'}
-                              </h3>
-                            </div>
-                            <span className="text-[10px] text-[#72DFD0] font-bold">
-                              {currentMode === 'kampus' ? 'Semester 5 (2026/2027)' : student.sppPeriod}
-                            </span>
-                          </div>
-
-                          <div className="p-3 space-y-2.5">
-                            <div className="flex items-center justify-between">
-                              <div>
-                                <p className="text-[10px] text-slate-500 font-medium">
-                                  {currentMode === 'kampus' ? 'Status UKT Semester 5' : 'Tagihan SPP Bulanan'}
-                                </p>
-                                <p className="text-lg font-extrabold text-slate-900">
-                                  {currentMode === 'kampus' ? 'Rp 6.500.000' : student.sppAmount}
-                                </p>
-                              </div>
-
-                              <div className="flex flex-col items-end gap-0.5">
-                                <span className="bg-emerald-500 text-white font-extrabold text-[11px] px-2.5 py-0.5 rounded-full flex items-center gap-1 shadow-xs">
-                                  <CheckCircle2 className="w-3 h-3" />
-                                  {currentMode === 'kampus' ? 'LUNAS via wondr' : student.sppStatus}
-                                </span>
-
-                                <span className="bg-[#E6FBF8] text-[#00A396] font-bold text-[9px] px-2 py-0.5 rounded-full flex items-center gap-1 border border-[#72DFD0]/40">
-                                  <RefreshCw className="w-2.5 h-2.5" />
-                                  {currentMode === 'kampus' ? 'Auto-Sync SPC H2H' : 'Autodebit Aktif'}
-                                </span>
-                              </div>
-                            </div>
-
-                            <button
-                              onClick={() => setShowReceiptModal(true)}
-                              className="w-full bg-[#E6FBF8] hover:bg-[#72DFD0]/30 text-[#00897B] font-bold text-xs py-2 rounded-xl flex items-center justify-center gap-1.5 border border-[#72DFD0]/40 transition-colors"
-                            >
-                              <Receipt className="w-3.5 h-3.5" />
-                              {currentMode === 'kampus' ? 'Lihat Bukti Bayar UKT & Rincian SKS' : 'Lihat Bukti Bayar & Detail SPP'}
-                            </button>
-                          </div>
-                        </div>
-
-                        {/* WIDGET 2: Kas Komunitas Ormawa (Shared Treasury Prominently Placed) */}
-                        {currentMode === 'kampus' && (
-                          <div className="bg-white p-3 rounded-2xl border border-slate-200/80 shadow-xs space-y-2">
-                            <div className="flex items-center justify-between">
-                              <div className="flex items-center gap-2">
-                                <div className="bg-teal-500 text-white p-1 rounded-lg">
-                                  <Building2 className="w-3.5 h-3.5" />
-                                </div>
+                        {/* TAB 1: HOME (Student Hub Main Clean Dashboard) */}
+                        {activeTab === 'home' && (
+                          <div className="space-y-3.5 animate-in fade-in duration-300">
+                            
+                            {/* Saldo Card BNI Taplus Muda */}
+                            <div className="bg-gradient-to-br from-[#FF7A00] via-[#F37021] to-[#D85A10] p-4 rounded-2xl text-white shadow-lg shadow-[#F37021]/20 relative overflow-hidden border border-orange-400/30">
+                              <div className="flex items-center justify-between">
                                 <div>
-                                  <h3 className="font-bold text-slate-900 text-xs">Kas Komunitas Ormawa</h3>
-                                  <p className="text-[9px] text-slate-500 font-medium">Shared Treasury (HIMA Sistem Informasi)</p>
+                                  <span className="text-[9px] tracking-wider uppercase bg-black/20 text-orange-100 font-bold px-2 py-0.5 rounded-full border border-white/10">
+                                    {currentMode === 'kampus' ? 'KTM Co-Brand BNI Unair' : 'Utama'}
+                                  </span>
+                                  <h3 className="font-extrabold text-sm tracking-wide mt-1">
+                                    {currentMode === 'kampus' ? 'BNI Taplus Muda' : 'BNI Taplus'}
+                                  </h3>
                                 </div>
-                              </div>
-                              <span className="bg-emerald-500/10 text-emerald-700 border border-emerald-300 font-bold text-[9px] px-2 py-0.5 rounded-full">
-                                Dual-Approval Active
-                              </span>
-                            </div>
-
-                            <div className="bg-slate-50 p-2.5 rounded-xl border border-slate-100 flex items-center justify-between">
-                              <div>
-                                <p className="text-[9px] text-slate-500 font-semibold">Kas Himpunan SI</p>
-                                <p className="text-base font-black text-slate-900">Saldo: Rp 4.200.000</p>
-                              </div>
-                              <div className="text-right">
-                                <span className="text-[9px] font-extrabold text-emerald-700 bg-emerald-50 px-1.5 py-0.5 rounded border border-emerald-200 block">
-                                  Approved by Ketua & Bendahara
-                                </span>
-                                <p className="text-[9px] text-slate-400 mt-0.5">Pengajuan: Rp 500.000 (LKMM)</p>
-                              </div>
-                            </div>
-
-                            <button
-                              onClick={() => triggerToast('✅ Dual-Approval OK! Dana Kas Himpunan Rp 500.000 disetujui via BNI Open API')}
-                              className="w-full bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs py-2 rounded-xl flex items-center justify-center gap-1.5 shadow-xs transition-colors"
-                            >
-                              <CheckCircle2 className="w-3.5 h-3.5 text-[#72DFD0]" />
-                              Approve Pencairan Dana (Akbar - Bendahara 2)
-                            </button>
-                          </div>
-                        )}
-
-                        {/* PILAR 2: CONNECTED E-COMMERCE (Compact Horizontal Row) */}
-                        {currentMode === 'kampus' && (
-                          <div className="bg-white p-3 rounded-2xl border border-slate-200/80 shadow-xs space-y-2">
-                            <div className="flex items-center justify-between">
-                              <h3 className="font-semibold text-slate-900 text-xs flex items-center gap-1.5">
-                                <Link2 className="w-3.5 h-3.5 text-[#00A396]" /> Connected E-Commerce (Direct Pay)
-                              </h3>
-                              <span className="text-[9px] font-extrabold text-teal-700 bg-teal-50 px-2 py-0.5 rounded-full">Pilar 2 Direct Link</span>
-                            </div>
-
-                            <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar pt-0.5">
-                              <div className="px-2.5 py-1 bg-slate-50 border border-slate-200/80 rounded-xl text-[10px] font-bold text-slate-800 flex items-center gap-1.5 shrink-0">
-                                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
-                                Gojek / GoPay ⚡
-                              </div>
-                              <div className="px-2.5 py-1 bg-slate-50 border border-slate-200/80 rounded-xl text-[10px] font-bold text-slate-800 flex items-center gap-1.5 shrink-0">
-                                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
-                                Tokopedia / Shopee ⚡
-                              </div>
-                              <div className="px-2.5 py-1 bg-slate-50 border border-slate-200/80 rounded-xl text-[10px] font-bold text-slate-800 flex items-center gap-1.5 shrink-0">
-                                <span className="w-1.5 h-1.5 rounded-full bg-teal-500"></span>
-                                PLN Auto-Debit
-                              </div>
-                            </div>
-                          </div>
-                        )}
-
-                        {/* HABIT BANKING WIDGET: KakaoBank 26-Week Challenge (Compact Height) */}
-                        {currentMode === 'kampus' && (
-                          <div className="bg-gradient-to-br from-amber-500/10 via-amber-50 to-emerald-500/10 p-3 rounded-2xl border border-amber-300/80 shadow-xs space-y-2">
-                            <div className="flex items-center justify-between">
-                              <div className="flex items-center gap-1.5">
-                                <Trophy className="w-3.5 h-3.5 text-amber-600" />
-                                <h3 className="font-extrabold text-slate-900 text-xs">🏆 Tantangan Nabung 26-Minggu</h3>
-                              </div>
-                              <span className="bg-amber-500 text-slate-950 font-black text-[9px] px-2 py-0.5 rounded-full uppercase">
-                                Streak 🔥 Wk 4
-                              </span>
-                            </div>
-
-                            <div className="space-y-1 bg-white/90 p-2 rounded-xl border border-amber-200 text-xs">
-                              <div className="flex items-center justify-between font-extrabold text-[11px]">
-                                <span className="text-slate-700">Minggu 4 / 26</span>
-                                <span className="text-emerald-700">Rp 400.000 / Rp 2.600.000</span>
+                                <img src="/assets/bni-logo.png" alt="BNI Logo" className="h-5 object-contain bg-white/10 px-2 py-0.5 rounded-md backdrop-blur-xs" />
                               </div>
 
-                              <div className="w-full h-1.5 bg-slate-200 rounded-full overflow-hidden">
-                                <div
-                                  className="h-full bg-gradient-to-r from-amber-400 to-[#00A396] rounded-full"
-                                  style={{ width: '15.3%' }}
-                                ></div>
-                              </div>
-
-                              <p className="text-[9px] text-slate-500 pt-0.5">
-                                Target: Dana Wisuda & Liburan Semester (Bunga 5.25% p.a.)
-                              </p>
-                            </div>
-
-                            <button
-                              onClick={() => triggerToast('🔥 Deposit Minggu ke-5 (Rp 100.000) Berhasil! Streak Nabung Bertambah!')}
-                              className="w-full bg-amber-500 hover:bg-amber-600 text-slate-950 font-extrabold text-xs py-1.5 rounded-xl flex items-center justify-center gap-1.5 shadow-xs transition-colors"
-                            >
-                              <Trophy className="w-3.5 h-3.5" /> Setor Wk 5 (Rp 100.000) & Keep Streak!
-                            </button>
-                          </div>
-                        )}
-
-                        {/* WIDGET 3 (KAMPUS MODE ONLY): Aktivitas Kampus Quick Actions */}
-                        {currentMode === 'kampus' && (
-                          <div className="bg-white p-3 rounded-2xl border border-slate-200/80 shadow-xs space-y-2">
-                            <h3 className="font-bold text-slate-900 text-xs flex items-center gap-1.5">
-                              <Sparkles className="w-3.5 h-3.5 text-[#00A396]" /> Aktivitas & Transaksi Kampus
-                            </h3>
-
-                            <div className="grid grid-cols-2 gap-2">
-                              <button
-                                onClick={() => triggerToast('🤝 Fitur Split Bill wondr Siap!')}
-                                className="p-2.5 rounded-xl bg-teal-50 hover:bg-teal-100/80 border border-teal-200 text-left transition-colors"
-                              >
-                                <span className="font-extrabold text-xs text-teal-900 block">🤝 Split Bill Nongkrong</span>
-                                <span className="text-[9px] text-teal-700 block mt-0.5">Patungan warkop / kafe</span>
-                              </button>
-
-                              <button
-                                onClick={() => triggerToast('💳 Top Up TapCash BNI Berhasil!')}
-                                className="p-2.5 rounded-xl bg-orange-50 hover:bg-orange-100/80 border border-orange-200 text-left transition-colors"
-                              >
-                                <span className="font-extrabold text-xs text-orange-900 block">💳 Top Up KTM TapCash</span>
-                                <span className="text-[9px] text-orange-700 block mt-0.5">Saldo E-Money BNI</span>
-                              </button>
-                            </div>
-                          </div>
-                        )}
-
-                        {/* Pagu Mandiri Mahasiswa / Monthly Budgeting */}
-                        <div className="bg-white p-3 rounded-2xl border border-slate-200/80 shadow-xs space-y-3">
-                          <div className="flex items-center justify-between">
-                            <div className="flex items-center gap-2">
-                              <div className="bg-[#D4F933] text-slate-950 p-1 rounded-lg">
-                                <Utensils className="w-3.5 h-3.5" />
-                              </div>
-                              <div>
-                                <h3 className="font-bold text-slate-900 text-xs">
-                                  {currentMode === 'kampus' ? 'Pagu Mandiri Mahasiswa / Monthly Budgeting' : 'Pagu Jajan Kantin'}
-                                </h3>
-                                <p className="text-[9px] text-slate-500 font-medium">
-                                  {currentMode === 'kampus' ? 'Alokasi anggaran bulanan mahasiswa mandiri (Akbar - Unair)' : 'Batas transaksi harian kartu jajan siswa'}
+                              <div className="mt-3">
+                                <div className="flex items-center gap-2 text-orange-100 text-xs font-medium">
+                                  <span>{currentMode === 'kampus' ? 'Saldo Tabungan Mahasiswa' : 'Saldo Rekening Utama'}</span>
+                                  <button onClick={() => setShowBalance(!showBalance)} className="hover:text-white">
+                                    {showBalance ? <Eye className="w-3.5 h-3.5" /> : <EyeOff className="w-3.5 h-3.5" />}
+                                  </button>
+                                </div>
+                                <p className="text-2xl font-black tracking-tight mt-0.5">
+                                  {showBalance ? (currentMode === 'kampus' ? 'Rp4.850.000' : 'Rp28.000.000') : '••••••••••••'}
                                 </p>
                               </div>
-                            </div>
-                          </div>
 
-                          <div className="space-y-1.5 bg-slate-50 p-2.5 rounded-xl border border-slate-100">
-                            <div className="flex items-center justify-between text-xs font-bold">
-                              <span className="text-slate-600">
-                                {currentMode === 'kampus' ? 'Alokasi Terpakai Bulan Ini' : 'Terpakai Hari Ini'}
-                              </span>
-                              <span className="text-slate-900 font-extrabold text-xs">
-                                Rp {student.spentToday.toLocaleString('id-ID')} / <span className="text-[#00A396]">Rp {student.dailyLimit.toLocaleString('id-ID')}</span>
-                              </span>
-                            </div>
-
-                            <div className="w-full h-2 bg-slate-200 rounded-full overflow-hidden p-0.5">
-                              <div
-                                className="h-full bg-gradient-to-r from-[#72DFD0] via-[#00B4A2] to-[#00A396] rounded-full transition-all duration-500"
-                                style={{
-                                  width: `${Math.min(100, Math.round((student.spentToday / student.dailyLimit) * 100))}%`
-                                }}
-                              ></div>
-                            </div>
-
-                            <div className="flex items-center justify-between text-[9px] text-slate-500 font-semibold">
-                              <span>Sisa Pagu: Rp {Math.max(0, student.dailyLimit - student.spentToday).toLocaleString('id-ID')}</span>
-                              <span>{Math.round((student.spentToday / student.dailyLimit) * 100)}% Terpakai</span>
-                            </div>
-                          </div>
-
-                          {/* Interactive Allowance Limit Slider */}
-                          <div className="space-y-2 pt-1 border-t border-slate-100">
-                            <div className="flex items-center justify-between">
-                              <label className="text-xs font-bold text-slate-900 flex items-center gap-1">
-                                <Sliders className="w-3.5 h-3.5 text-[#00A396]" />
-                                {currentMode === 'kampus' ? 'Atur Pagu Bulanan Mandiri' : 'Atur Batas Pagu Harian'}
-                              </label>
-                              <span className="text-xs font-extrabold text-[#00A396] bg-[#E6FBF8] px-2 py-0.5 rounded-md border border-[#72DFD0]/40">
-                                Rp {student.dailyLimit.toLocaleString('id-ID')}
-                              </span>
-                            </div>
-
-                            <input
-                              type="range"
-                              min="10000"
-                              max="50000"
-                              step="5000"
-                              value={student.dailyLimit}
-                              onChange={handleLimitChange}
-                              className="w-full h-1.5 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-[#00A396]"
-                            />
-
-                            <div className="grid grid-cols-4 gap-1 pt-0.5">
-                              {[10000, 20000, 30000, 50000].map((preset) => (
-                                <button
-                                  key={preset}
-                                  onClick={() => {
-                                    setStudentsData(prev => ({
-                                      ...prev,
-                                      [selectedStudentId]: {
-                                        ...prev[selectedStudentId],
-                                        dailyLimit: preset
-                                      }
-                                    }));
-                                    triggerToast(`Pagu diubah ke Rp ${preset.toLocaleString('id-ID')}`);
-                                  }}
-                                  className={`py-0.5 rounded-lg text-[10px] font-bold border transition-all ${
-                                    student.dailyLimit === preset
-                                      ? 'bg-slate-900 text-white border-slate-900'
-                                      : 'bg-slate-50 text-slate-600 border-slate-200 hover:bg-slate-100'
-                                  }`}
-                                >
-                                  {preset / 1000}rb
+                              <div className="flex items-center justify-between pt-2 mt-2 border-t border-white/20 text-xs">
+                                <div className="flex items-center gap-1.5 bg-black/20 px-2.5 py-1 rounded-xl">
+                                  <span className="font-mono text-slate-100 font-semibold">0223383830</span>
+                                  <button onClick={handleCopyAccount} className="hover:text-amber-200">
+                                    <Copy className="w-3.5 h-3.5" />
+                                  </button>
+                                </div>
+                                <button onClick={() => triggerToast('Fitur Top Up Saldo Siap')} className="bg-white/20 hover:bg-white/30 text-white px-3 py-1 rounded-xl font-bold text-[11px]">
+                                  + Top Up
                                 </button>
-                              ))}
+                              </div>
                             </div>
-                          </div>
-                        </div>
 
-                        {/* FEATURE 4: Reward / Benefit Banner */}
-                        <div
-                          onClick={() => setShowKprModal(true)}
-                          className="bg-gradient-to-br from-amber-500/10 via-amber-50 to-emerald-500/10 p-3 rounded-2xl border border-amber-300/60 shadow-xs cursor-pointer hover:border-amber-400"
-                        >
-                          <div className="flex items-start gap-2.5">
-                            <div className="w-8 h-8 rounded-xl bg-amber-500 text-slate-950 flex items-center justify-center shrink-0 font-bold">
-                              <Sparkles className="w-4 h-4 text-slate-950" />
+                            {/* SECTION 1: LAYANAN KAMPUS & KEUANGAN (Ringkas Grid 6 Icons) */}
+                            {currentMode === 'kampus' ? (
+                              <div className="bg-white p-3.5 rounded-2xl border border-slate-200/80 shadow-xs space-y-3">
+                                <div className="flex items-center justify-between">
+                                  <h3 className="font-bold text-slate-900 text-xs flex items-center gap-1.5">
+                                    <GraduationCap className="w-4 h-4 text-[#00A396]" />
+                                    Layanan Kampus & Keuangan
+                                  </h3>
+                                  <span className="text-[10px] text-slate-400 font-semibold">Ketuk rincian</span>
+                                </div>
+
+                                <div className="grid grid-cols-3 gap-2.5">
+                                  {/* Icon 1: UKT+ Portal */}
+                                  <button
+                                    onClick={() => setActiveCampusSheet('ukt')}
+                                    className="p-2.5 rounded-xl bg-slate-50 hover:bg-[#E6FBF8] border border-slate-200/80 hover:border-[#72DFD0] flex flex-col items-center gap-1.5 relative transition-all group"
+                                  >
+                                    <div className="w-10 h-10 rounded-xl bg-[#E6FBF8] text-[#00A396] flex items-center justify-center shadow-xs">
+                                      <Receipt className="w-5 h-5" />
+                                    </div>
+                                    <span className="text-[11px] font-bold text-slate-800 text-center leading-tight">UKT+ Portal</span>
+                                    <span className="absolute -top-1 -right-1 bg-emerald-500 text-white font-black text-[8px] px-1.5 py-0.5 rounded-full uppercase shadow-xs">
+                                      Lunas
+                                    </span>
+                                  </button>
+
+                                  {/* Icon 2: Kas Ormawa */}
+                                  <button
+                                    onClick={() => setActiveCampusSheet('ormawa')}
+                                    className="p-2.5 rounded-xl bg-slate-50 hover:bg-[#E6FBF8] border border-slate-200/80 hover:border-[#72DFD0] flex flex-col items-center gap-1.5 relative transition-all group"
+                                  >
+                                    <div className="w-10 h-10 rounded-xl bg-teal-100 text-teal-800 flex items-center justify-center shadow-xs">
+                                      <Building2 className="w-5 h-5" />
+                                    </div>
+                                    <span className="text-[11px] font-bold text-slate-800 text-center leading-tight">Kas Ormawa</span>
+                                    <span className="absolute -top-1 -right-1 bg-amber-500 text-slate-950 font-black text-[8px] px-1.5 py-0.5 rounded-full uppercase shadow-xs">
+                                      1 Pending
+                                    </span>
+                                  </button>
+
+                                  {/* Icon 3: Top Up KTM (TapCash) */}
+                                  <button
+                                    onClick={() => setActiveCampusSheet('tapcash')}
+                                    className="p-2.5 rounded-xl bg-slate-50 hover:bg-[#E6FBF8] border border-slate-200/80 hover:border-[#72DFD0] flex flex-col items-center gap-1.5 relative transition-all group"
+                                  >
+                                    <div className="w-10 h-10 rounded-xl bg-orange-100 text-orange-700 flex items-center justify-center shadow-xs">
+                                      <CreditCard className="w-5 h-5" />
+                                    </div>
+                                    <span className="text-[11px] font-bold text-slate-800 text-center leading-tight">Top Up KTM</span>
+                                    <span className="text-[8px] bg-orange-50 text-orange-700 font-extrabold px-1 rounded">TapCash</span>
+                                  </button>
+
+                                  {/* Icon 4: Split Bill */}
+                                  <button
+                                    onClick={() => setActiveCampusSheet('splitbill')}
+                                    className="p-2.5 rounded-xl bg-slate-50 hover:bg-[#E6FBF8] border border-slate-200/80 hover:border-[#72DFD0] flex flex-col items-center gap-1.5 relative transition-all group"
+                                  >
+                                    <div className="w-10 h-10 rounded-xl bg-emerald-100 text-emerald-800 flex items-center justify-center shadow-xs">
+                                      <Users className="w-5 h-5" />
+                                    </div>
+                                    <span className="text-[11px] font-bold text-slate-800 text-center leading-tight">Split Bill</span>
+                                  </button>
+
+                                  {/* Icon 5: Connected E-Wallet */}
+                                  <button
+                                    onClick={() => setActiveCampusSheet('ewallet')}
+                                    className="p-2.5 rounded-xl bg-slate-50 hover:bg-[#E6FBF8] border border-slate-200/80 hover:border-[#72DFD0] flex flex-col items-center gap-1.5 relative transition-all group"
+                                  >
+                                    <div className="w-10 h-10 rounded-xl bg-cyan-100 text-cyan-800 flex items-center justify-center shadow-xs">
+                                      <Link2 className="w-5 h-5" />
+                                    </div>
+                                    <span className="text-[11px] font-bold text-slate-800 text-center leading-tight">E-Wallet Link</span>
+                                  </button>
+
+                                  {/* Icon 6: Budgeting / Pagu */}
+                                  <button
+                                    onClick={() => setActiveCampusSheet('budgeting')}
+                                    className="p-2.5 rounded-xl bg-slate-50 hover:bg-[#E6FBF8] border border-slate-200/80 hover:border-[#72DFD0] flex flex-col items-center gap-1.5 relative transition-all group"
+                                  >
+                                    <div className="w-10 h-10 rounded-xl bg-[#D4F933] text-slate-950 flex items-center justify-center shadow-xs">
+                                      <Sliders className="w-5 h-5" />
+                                    </div>
+                                    <span className="text-[11px] font-bold text-slate-800 text-center leading-tight">Budgeting</span>
+                                  </button>
+                                </div>
+                              </div>
+                            ) : (
+                              /* Sekolah Mode: Status SPP Widget */
+                              <div className="bg-white rounded-2xl border border-slate-200/80 shadow-xs overflow-hidden">
+                                <div className="bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900 p-3 text-white flex items-center justify-between">
+                                  <div className="flex items-center gap-2">
+                                    <div className="bg-[#72DFD0] text-slate-950 p-1 rounded-lg">
+                                      <Receipt className="w-3.5 h-3.5" />
+                                    </div>
+                                    <h3 className="font-bold text-xs tracking-wide">Status Pembayaran SPP</h3>
+                                  </div>
+                                  <span className="text-[10px] text-[#72DFD0] font-bold">{student.sppPeriod}</span>
+                                </div>
+
+                                <div className="p-3 space-y-2.5">
+                                  <div className="flex items-center justify-between">
+                                    <div>
+                                      <p className="text-[10px] text-slate-500 font-medium">Tagihan SPP Bulanan</p>
+                                      <p className="text-lg font-extrabold text-slate-900">{student.sppAmount}</p>
+                                    </div>
+
+                                    <div className="flex flex-col items-end gap-0.5">
+                                      <span className="bg-emerald-500 text-white font-extrabold text-[11px] px-2.5 py-0.5 rounded-full flex items-center gap-1 shadow-xs">
+                                        <CheckCircle2 className="w-3 h-3" />
+                                        {student.sppStatus}
+                                      </span>
+                                      <span className="bg-[#E6FBF8] text-[#00A396] font-bold text-[9px] px-2 py-0.5 rounded-full flex items-center gap-1 border border-[#72DFD0]/40">
+                                        <RefreshCw className="w-2.5 h-2.5" />
+                                        Autodebit Aktif
+                                      </span>
+                                    </div>
+                                  </div>
+
+                                  <button
+                                    onClick={() => setShowReceiptModal(true)}
+                                    className="w-full bg-[#E6FBF8] hover:bg-[#72DFD0]/30 text-[#00897B] font-bold text-xs py-2 rounded-xl flex items-center justify-center gap-1.5 border border-[#72DFD0]/40 transition-colors"
+                                  >
+                                    <Receipt className="w-3.5 h-3.5" /> Lihat Bukti Bayar & Detail SPP
+                                  </button>
+                                </div>
+                              </div>
+                            )}
+
+                            {/* SECTION 2: CAROUSEL BANNER HORIZONTAL (Fitur Pilihan & Promo) */}
+                            {currentMode === 'kampus' && (
+                              <div className="space-y-2">
+                                <div className="flex items-center justify-between px-1">
+                                  <h3 className="font-bold text-slate-900 text-xs flex items-center gap-1.5">
+                                    <Sparkles className="w-4 h-4 text-amber-500" />
+                                    Fitur Pilihan & Promo
+                                  </h3>
+                                  <span className="text-[10px] text-[#00A396] font-semibold">Geser ke kanan →</span>
+                                </div>
+
+                                <div className="flex items-stretch gap-3 overflow-x-auto no-scrollbar pb-1 snap-x">
+                                  
+                                  {/* Card 1 Carousel: Nabung 26-Minggu */}
+                                  <div className="min-w-[270px] max-w-[280px] snap-start bg-gradient-to-br from-amber-500/10 via-amber-50 to-emerald-500/10 p-3.5 rounded-2xl border border-amber-300/80 shadow-xs space-y-2 shrink-0 flex flex-col justify-between">
+                                    <div className="flex items-center justify-between">
+                                      <div className="flex items-center gap-1.5">
+                                        <Trophy className="w-4 h-4 text-amber-600" />
+                                        <h4 className="font-extrabold text-slate-900 text-xs">Nabung 26-Minggu</h4>
+                                      </div>
+                                      <span className="bg-amber-500 text-slate-950 font-black text-[9px] px-2 py-0.5 rounded-full uppercase">
+                                        Streak 🔥 Wk 4
+                                      </span>
+                                    </div>
+
+                                    <div className="space-y-1 bg-white/90 p-2.5 rounded-xl border border-amber-200 text-xs">
+                                      <div className="flex items-center justify-between font-extrabold text-[11px]">
+                                        <span className="text-slate-700">Minggu 4 / 26</span>
+                                        <span className="text-emerald-700">Rp 400.000 / Rp 2.600.000</span>
+                                      </div>
+                                      <div className="w-full h-1.5 bg-slate-200 rounded-full overflow-hidden">
+                                        <div className="h-full bg-gradient-to-r from-amber-400 to-[#00A396] rounded-full" style={{ width: '15.3%' }}></div>
+                                      </div>
+                                      <p className="text-[9px] text-slate-500 pt-0.5">Bunga 5.25% p.a. • Target: Wisuda & Liburan</p>
+                                    </div>
+
+                                    <button
+                                      onClick={() => triggerToast('🔥 Deposit Minggu ke-5 (Rp 100.000) Berhasil! Streak Nabung Bertambah!')}
+                                      className="w-full bg-amber-500 hover:bg-amber-600 text-slate-950 font-extrabold text-xs py-1.5 rounded-xl flex items-center justify-center gap-1.5 shadow-xs transition-colors"
+                                    >
+                                      <Trophy className="w-3.5 h-3.5" /> Setor Wk 5 (Rp 100.000)
+                                    </button>
+                                  </div>
+
+                                  {/* Card 2 Carousel: Benefit Student BNI Co-Brand */}
+                                  <div className="min-w-[270px] max-w-[280px] snap-start bg-gradient-to-br from-emerald-900 via-teal-900 to-slate-900 text-white p-3.5 rounded-2xl border border-emerald-500/40 shadow-xs space-y-2 shrink-0 flex flex-col justify-between">
+                                    <div className="flex items-center justify-between">
+                                      <div className="flex items-center gap-1.5">
+                                        <Sparkles className="w-4 h-4 text-[#D4F933]" />
+                                        <h4 className="font-extrabold text-white text-xs">Benefit Student Co-Brand</h4>
+                                      </div>
+                                      <span className="bg-[#D4F933] text-slate-950 font-black text-[9px] px-2 py-0.5 rounded-full uppercase">PROMO</span>
+                                    </div>
+
+                                    <p className="text-xs text-slate-200 font-semibold leading-relaxed">
+                                      Dapatkan <span className="text-[#72DFD0] font-bold underline">Cashback 15%</span> Merchant Kampus & Beasiswa Talent BNI Pre-Approved!
+                                    </p>
+
+                                    <button
+                                      onClick={() => triggerToast('🌟 Promo Cashback 15% Merchant Kampus Diaktifkan!')}
+                                      className="w-full bg-[#72DFD0] hover:bg-[#00B4A2] text-slate-950 font-extrabold text-xs py-1.5 rounded-xl flex items-center justify-center gap-1.5 shadow-xs transition-colors"
+                                    >
+                                      Klaim Promo Cashback
+                                    </button>
+                                  </div>
+
+                                </div>
+                              </div>
+                            )}
+
+                          </div>
+                        )}
+
+                        {/* TAB 2: TRANSAKSI (Detail Histori UKT, Transfer & Direct Pay E-Commerce) */}
+                        {activeTab === 'transaksi' && (
+                          <div className="space-y-3.5 animate-in fade-in duration-300">
+                            {/* UKT+ Card */}
+                            <div className="bg-white rounded-2xl border border-slate-200/80 shadow-xs overflow-hidden">
+                              <div className="bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900 p-3 text-white flex items-center justify-between">
+                                <div className="flex items-center gap-2">
+                                  <div className="bg-[#72DFD0] text-slate-950 p-1 rounded-lg">
+                                    <Receipt className="w-3.5 h-3.5" />
+                                  </div>
+                                  <h3 className="font-bold text-xs tracking-wide">
+                                    {currentMode === 'kampus' ? 'UKT+ Portal (Host-to-Host BNI)' : 'Status Pembayaran SPP'}
+                                  </h3>
+                                </div>
+                                <span className="text-[10px] text-[#72DFD0] font-bold">
+                                  {currentMode === 'kampus' ? 'Semester 5 (2026/2027)' : student.sppPeriod}
+                                </span>
+                              </div>
+
+                              <div className="p-3 space-y-2.5">
+                                <div className="flex items-center justify-between">
+                                  <div>
+                                    <p className="text-[10px] text-slate-500 font-medium">
+                                      {currentMode === 'kampus' ? 'Status UKT Semester 5' : 'Tagihan SPP Bulanan'}
+                                    </p>
+                                    <p className="text-lg font-extrabold text-slate-900">
+                                      {currentMode === 'kampus' ? 'Rp 6.500.000' : student.sppAmount}
+                                    </p>
+                                  </div>
+
+                                  <div className="flex flex-col items-end gap-0.5">
+                                    <span className="bg-emerald-500 text-white font-extrabold text-[11px] px-2.5 py-0.5 rounded-full flex items-center gap-1 shadow-xs">
+                                      <CheckCircle2 className="w-3 h-3" />
+                                      {currentMode === 'kampus' ? 'LUNAS via wondr' : student.sppStatus}
+                                    </span>
+                                    <span className="bg-[#E6FBF8] text-[#00A396] font-bold text-[9px] px-2 py-0.5 rounded-full flex items-center gap-1 border border-[#72DFD0]/40">
+                                      <RefreshCw className="w-2.5 h-2.5" />
+                                      {currentMode === 'kampus' ? 'Auto-Sync SPC H2H' : 'Autodebit Aktif'}
+                                    </span>
+                                  </div>
+                                </div>
+
+                                <button
+                                  onClick={() => setShowReceiptModal(true)}
+                                  className="w-full bg-[#E6FBF8] hover:bg-[#72DFD0]/30 text-[#00897B] font-bold text-xs py-2 rounded-xl flex items-center justify-center gap-1.5 border border-[#72DFD0]/40 transition-colors"
+                                >
+                                  <Receipt className="w-3.5 h-3.5" />
+                                  {currentMode === 'kampus' ? 'Lihat Bukti Bayar UKT & Rincian SKS' : 'Lihat Bukti Bayar & Detail SPP'}
+                                </button>
+                              </div>
                             </div>
-                            <div className="space-y-0.5">
-                              <span className="text-amber-800 font-extrabold text-xs block">
-                                {currentMode === 'kampus' ? '🌟 Benefit Student BNI Co-Brand' : '🌟 Reward Kedisiplinan SPP'}
-                              </span>
-                              <p className="text-[11px] text-slate-800 font-semibold leading-snug">
-                                {currentMode === 'kampus' ? (
-                                  <>Dapatkan <span className="text-[#00897B] font-bold underline">Cashback 15% Merchant Kampus</span> & Beasiswa Talent BNI!</>
-                                ) : (
-                                  <>Anda berhak mendapatkan <span className="text-[#00897B] font-bold underline">KPR Flexi BNI Bunga 2.75%</span> Pre-Approved!</>
-                                )}
-                              </p>
+
+                            {/* Connected E-Commerce */}
+                            <div className="bg-white p-3.5 rounded-2xl border border-slate-200/80 shadow-xs space-y-2">
+                              <div className="flex items-center justify-between">
+                                <h3 className="font-semibold text-slate-900 text-xs flex items-center gap-1.5">
+                                  <Link2 className="w-3.5 h-3.5 text-[#00A396]" /> Connected E-Commerce (Direct Pay)
+                                </h3>
+                                <span className="text-[9px] font-extrabold text-teal-700 bg-teal-50 px-2 py-0.5 rounded-full">Pilar 2 Direct Link</span>
+                              </div>
+
+                              <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar pt-0.5">
+                                <div className="px-2.5 py-1 bg-slate-50 border border-slate-200/80 rounded-xl text-[10px] font-bold text-slate-800 flex items-center gap-1.5 shrink-0">
+                                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-500"></span> Gojek / GoPay ⚡
+                                </div>
+                                <div className="px-2.5 py-1 bg-slate-50 border border-slate-200/80 rounded-xl text-[10px] font-bold text-slate-800 flex items-center gap-1.5 shrink-0">
+                                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-500"></span> Tokopedia / Shopee ⚡
+                                </div>
+                                <div className="px-2.5 py-1 bg-slate-50 border border-slate-200/80 rounded-xl text-[10px] font-bold text-slate-800 flex items-center gap-1.5 shrink-0">
+                                  <span className="w-1.5 h-1.5 rounded-full bg-teal-500"></span> PLN Auto-Debit
+                                </div>
+                              </div>
+                            </div>
+
+                            {/* Transaksi Terakhir */}
+                            <div className="bg-white p-3.5 rounded-2xl border border-slate-200/80 shadow-xs space-y-3">
+                              <h3 className="font-bold text-slate-900 text-xs">Transaksi Terakhir</h3>
+                              <div className="space-y-2">
+                                {student.canteenHistory.slice(0, 3).map((item) => (
+                                  <div key={item.id} className="flex items-center justify-between p-2.5 rounded-xl bg-slate-50 border border-slate-100 text-xs">
+                                    <div className="flex items-center gap-3">
+                                      <div className="w-8 h-8 rounded-lg flex items-center justify-center bg-teal-100 text-[#00A396]">
+                                        <Utensils className="w-4 h-4" />
+                                      </div>
+                                      <div>
+                                        <p className="font-bold text-slate-900">{item.title}</p>
+                                        <p className="text-[10px] text-slate-500">{item.time} • KTM BNI Co-Brand</p>
+                                      </div>
+                                    </div>
+                                    <span className="font-bold text-slate-900">-Rp {item.price.toLocaleString('id-ID')}</span>
+                                  </div>
+                                ))}
+                              </div>
                             </div>
                           </div>
-                        </div>
+                        )}
+
+                        {/* TAB 3: INSIGHT (Pagu Mandiri / Monthly Budgeting Slider) */}
+                        {activeTab === 'insights' && (
+                          <div className="space-y-3.5 animate-in fade-in duration-300">
+                            <div className="bg-white p-3.5 rounded-2xl border border-slate-200/80 shadow-xs space-y-3">
+                              <div className="flex items-center justify-between">
+                                <div className="flex items-center gap-2">
+                                  <div className="bg-[#D4F933] text-slate-950 p-1 rounded-lg">
+                                    <Sliders className="w-4 h-4" />
+                                  </div>
+                                  <div>
+                                    <h3 className="font-bold text-slate-900 text-xs">
+                                      {currentMode === 'kampus' ? 'Pagu Mandiri Mahasiswa / Monthly Budgeting' : 'Pagu Jajan Kantin'}
+                                    </h3>
+                                    <p className="text-[9px] text-slate-500 font-medium">
+                                      {currentMode === 'kampus' ? 'Alokasi anggaran bulanan mahasiswa mandiri (Akbar - Unair)' : 'Batas transaksi harian kartu jajan siswa'}
+                                    </p>
+                                  </div>
+                                </div>
+                              </div>
+
+                              <div className="space-y-1.5 bg-slate-50 p-2.5 rounded-xl border border-slate-100">
+                                <div className="flex items-center justify-between text-xs font-bold">
+                                  <span className="text-slate-600">Alokasi Terpakai Bulan Ini</span>
+                                  <span className="text-slate-900 font-extrabold text-xs">
+                                    Rp {student.spentToday.toLocaleString('id-ID')} / <span className="text-[#00A396]">Rp {student.dailyLimit.toLocaleString('id-ID')}</span>
+                                  </span>
+                                </div>
+
+                                <div className="w-full h-2 bg-slate-200 rounded-full overflow-hidden p-0.5">
+                                  <div
+                                    className="h-full bg-gradient-to-r from-[#72DFD0] via-[#00B4A2] to-[#00A396] rounded-full transition-all duration-500"
+                                    style={{
+                                      width: `${Math.min(100, Math.round((student.spentToday / student.dailyLimit) * 100))}%`
+                                    }}
+                                  ></div>
+                                </div>
+
+                                <div className="flex items-center justify-between text-[9px] text-slate-500 font-semibold">
+                                  <span>Sisa Pagu: Rp {Math.max(0, student.dailyLimit - student.spentToday).toLocaleString('id-ID')}</span>
+                                  <span>{Math.round((student.spentToday / student.dailyLimit) * 100)}% Terpakai</span>
+                                </div>
+                              </div>
+
+                              <div className="space-y-2 pt-1 border-t border-slate-100">
+                                <div className="flex items-center justify-between">
+                                  <label className="text-xs font-bold text-slate-900 flex items-center gap-1">
+                                    <Sliders className="w-3.5 h-3.5 text-[#00A396]" /> Atur Batas Pagu Mandiri
+                                  </label>
+                                  <span className="text-xs font-extrabold text-[#00A396] bg-[#E6FBF8] px-2 py-0.5 rounded-md border border-[#72DFD0]/40">
+                                    Rp {student.dailyLimit.toLocaleString('id-ID')}
+                                  </span>
+                                </div>
+
+                                <input
+                                  type="range"
+                                  min="10000"
+                                  max="50000"
+                                  step="5000"
+                                  value={student.dailyLimit}
+                                  onChange={handleLimitChange}
+                                  className="w-full h-1.5 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-[#00A396]"
+                                />
+
+                                <div className="grid grid-cols-4 gap-1 pt-0.5">
+                                  {[10000, 20000, 30000, 50000].map((preset) => (
+                                    <button
+                                      key={preset}
+                                      onClick={() => {
+                                        setStudentsData(prev => ({
+                                          ...prev,
+                                          [selectedStudentId]: { ...prev[selectedStudentId], dailyLimit: preset }
+                                        }));
+                                        triggerToast(`Pagu diubah ke Rp ${preset.toLocaleString('id-ID')}`);
+                                      }}
+                                      className={`py-1 rounded-lg text-[10px] font-bold border transition-all ${
+                                        student.dailyLimit === preset ? 'bg-slate-900 text-white border-slate-900' : 'bg-slate-50 text-slate-600 border-slate-200'
+                                      }`}
+                                    >
+                                      {preset / 1000}rb
+                                    </button>
+                                  ))}
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        )}
+
+                        {/* TAB 4: GROWTH (Modul Nabung 26-Minggu & Investasi Reksa Dana) */}
+                        {activeTab === 'growth' && (
+                          <div className="space-y-3.5 animate-in fade-in duration-300">
+                            {/* Nabung 26-Minggu Modul Lengkap */}
+                            <div className="bg-gradient-to-br from-amber-500/10 via-amber-50 to-emerald-500/10 p-3.5 rounded-2xl border border-amber-300/80 shadow-xs space-y-3">
+                              <div className="flex items-center justify-between">
+                                <div className="flex items-center gap-1.5">
+                                  <Trophy className="w-4 h-4 text-amber-600" />
+                                  <h3 className="font-extrabold text-slate-900 text-xs">🏆 Tantangan Nabung 26-Minggu</h3>
+                                </div>
+                                <span className="bg-amber-500 text-slate-950 font-black text-[9px] px-2 py-0.5 rounded-full uppercase">
+                                  Streak 🔥 Wk 4
+                                </span>
+                              </div>
+
+                              <div className="space-y-1.5 bg-white/90 p-3 rounded-xl border border-amber-200 text-xs">
+                                <div className="flex items-center justify-between font-extrabold text-[11px]">
+                                  <span className="text-slate-700">Minggu 4 / 26</span>
+                                  <span className="text-emerald-700">Rp 400.000 / Rp 2.600.000</span>
+                                </div>
+
+                                <div className="w-full h-2 bg-slate-200 rounded-full overflow-hidden">
+                                  <div className="h-full bg-gradient-to-r from-amber-400 to-[#00A396] rounded-full" style={{ width: '15.3%' }}></div>
+                                </div>
+
+                                <p className="text-[10px] text-slate-600 pt-1 font-semibold">
+                                  💡 Target: Dana Wisuda & Liburan Semester (Bunga Spesial 5.25% p.a.)
+                                </p>
+                              </div>
+
+                              <button
+                                onClick={() => triggerToast('🔥 Deposit Minggu ke-5 (Rp 100.000) Berhasil! Streak Nabung Bertambah!')}
+                                className="w-full bg-amber-500 hover:bg-amber-600 text-slate-950 font-extrabold text-xs py-2 rounded-xl flex items-center justify-center gap-1.5 shadow-xs transition-colors"
+                              >
+                                <Trophy className="w-4 h-4" /> Setor Wk 5 (Rp 100.000) & Keep Streak!
+                              </button>
+                            </div>
+
+                            {/* Reksa Dana & Tabungan Masa Depan Mahasiswa BNI */}
+                            <div className="bg-white p-3.5 rounded-2xl border border-slate-200/80 shadow-xs space-y-2">
+                              <div className="flex items-center justify-between">
+                                <h3 className="font-extrabold text-slate-900 text-xs flex items-center gap-1.5">
+                                  <TrendingUp className="w-4 h-4 text-[#00A396]" /> Reksa Dana Mahasiswa BNI
+                                </h3>
+                                <span className="bg-emerald-100 text-emerald-800 text-[9px] font-bold px-2 py-0.5 rounded-full">Low Risk</span>
+                              </div>
+                              <p className="text-[11px] text-slate-600">
+                                Mulai investasi dari <b>Rp 10.000</b> via BNI Asset Management. Return historis 6.2% p.a.
+                              </p>
+                              <button
+                                onClick={() => triggerToast('📈 Modul Investasi Reksa Dana BNI Siap!')}
+                                className="w-full bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs py-2 rounded-xl"
+                              >
+                                Jelajahi Reksa Dana BNI
+                              </button>
+                            </div>
+                          </div>
+                        )}
 
                       </div>
                     )}
@@ -1195,6 +1382,226 @@ export default function App() {
                         <p className="font-bold text-slate-900">SPP Bulan Juli Akbar Rp 1.500.000 terdebit</p>
                       </div>
                     </div>
+                  </div>
+                </div>
+              )}
+
+              {/* BOTTOM SHEET MODAL SYSTEM FOR KAMPUS SERVICES */}
+              {activeCampusSheet && (
+                <div className="absolute inset-0 bg-slate-950/70 backdrop-blur-xs z-50 flex items-end justify-center p-0 animate-in fade-in duration-200">
+                  <div className="bg-white w-full rounded-t-3xl p-5 space-y-4 border-t border-slate-200 animate-in slide-in-from-bottom duration-300 max-h-[85%] overflow-y-auto">
+                    
+                    <div className="flex items-center justify-between border-b border-slate-100 pb-3">
+                      <div className="flex items-center gap-2">
+                        <div className="p-2 rounded-xl bg-[#E6FBF8] text-[#00A396]">
+                          {activeCampusSheet === 'ukt' && <Receipt className="w-5 h-5" />}
+                          {activeCampusSheet === 'ormawa' && <Building2 className="w-5 h-5" />}
+                          {activeCampusSheet === 'tapcash' && <CreditCard className="w-5 h-5" />}
+                          {activeCampusSheet === 'splitbill' && <Users className="w-5 h-5" />}
+                          {activeCampusSheet === 'ewallet' && <Link2 className="w-5 h-5" />}
+                          {activeCampusSheet === 'budgeting' && <Sliders className="w-5 h-5" />}
+                        </div>
+                        <div>
+                          <h3 className="font-extrabold text-slate-900 text-sm">
+                            {activeCampusSheet === 'ukt' && 'UKT+ Portal (Host-to-Host BNI)'}
+                            {activeCampusSheet === 'ormawa' && 'Kas Komunitas Ormawa'}
+                            {activeCampusSheet === 'tapcash' && 'Top Up KTM TapCash BNI'}
+                            {activeCampusSheet === 'splitbill' && 'Split Bill Nongkrong'}
+                            {activeCampusSheet === 'ewallet' && 'Connected E-Commerce Direct Link'}
+                            {activeCampusSheet === 'budgeting' && 'Pagu Mandiri & Monthly Budgeting'}
+                          </h3>
+                          <p className="text-[10px] text-slate-500 font-semibold">Layanan Keuangan Edukasi BNI Open API</p>
+                        </div>
+                      </div>
+                      <button onClick={() => setActiveCampusSheet(null)} className="p-1 text-slate-400 hover:text-slate-600">
+                        <X className="w-5 h-5" />
+                      </button>
+                    </div>
+
+                    {activeCampusSheet === 'ukt' && (
+                      <div className="space-y-3 text-xs">
+                        <div className="bg-slate-900 text-white p-3.5 rounded-2xl flex items-center justify-between">
+                          <div>
+                            <p className="text-[10px] text-slate-300">Status UKT Semester 5</p>
+                            <p className="text-lg font-black text-[#72DFD0]">Rp 6.500.000</p>
+                          </div>
+                          <span className="bg-emerald-500 text-white font-extrabold text-[10px] px-2.5 py-1 rounded-full flex items-center gap-1">
+                            <CheckCircle2 className="w-3.5 h-3.5" /> LUNAS via wondr
+                          </span>
+                        </div>
+                        <div className="bg-slate-50 p-3 rounded-xl border border-slate-200/80 space-y-1">
+                          <div className="flex justify-between text-slate-600"><span>NIM Mahasiswa</span><span className="font-bold text-slate-900">18239012</span></div>
+                          <div className="flex justify-between text-slate-600"><span>Fakultas / Prodi</span><span className="font-bold text-slate-900">FST / Sistem Informasi</span></div>
+                          <div className="flex justify-between text-slate-600"><span>Status Sync Host</span><span className="font-bold text-emerald-600">Auto-Sync SPC H2H BNI</span></div>
+                        </div>
+                        <button
+                          onClick={() => { setActiveCampusSheet(null); setShowReceiptModal(true); }}
+                          className="w-full bg-[#E6FBF8] hover:bg-[#72DFD0]/30 text-[#00897B] font-bold text-xs py-2.5 rounded-xl flex items-center justify-center gap-1.5 border border-[#72DFD0]/40"
+                        >
+                          <Receipt className="w-4 h-4" /> Lihat Bukti Bayar UKT & Rincian SKS
+                        </button>
+                      </div>
+                    )}
+
+                    {activeCampusSheet === 'ormawa' && (
+                      <div className="space-y-3 text-xs">
+                        <div className="bg-slate-50 p-3 rounded-2xl border border-slate-200 flex items-center justify-between">
+                          <div>
+                            <p className="text-[10px] text-slate-500 font-semibold">Kas Himpunan SI</p>
+                            <p className="text-base font-black text-slate-900">Saldo: Rp 4.200.000</p>
+                          </div>
+                          <span className="bg-emerald-100 text-emerald-800 font-bold text-[9px] px-2 py-0.5 rounded-full border border-emerald-300">
+                            Dual-Approval Active
+                          </span>
+                        </div>
+                        <div className="bg-amber-50 p-3 rounded-xl border border-amber-200 space-y-1">
+                          <p className="font-bold text-amber-900">Pengajuan Dana Belum Disetujui (1 Pending):</p>
+                          <p className="text-slate-700">Kegiatan LKMM Himpunan SI — Rp 500.000</p>
+                        </div>
+                        <button
+                          onClick={() => {
+                            triggerToast('✅ Dual-Approval OK! Dana Kas Himpunan Rp 500.000 disetujui via BNI Open API');
+                            setActiveCampusSheet(null);
+                          }}
+                          className="w-full bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs py-2.5 rounded-xl flex items-center justify-center gap-1.5 shadow-xs"
+                        >
+                          <CheckCircle2 className="w-4 h-4 text-[#72DFD0]" /> Approve Pencairan Dana (Akbar - Bendahara 2)
+                        </button>
+                      </div>
+                    )}
+
+                    {activeCampusSheet === 'tapcash' && (
+                      <div className="space-y-3 text-xs">
+                        <div className="bg-gradient-to-r from-orange-500 to-amber-500 text-white p-3.5 rounded-2xl flex items-center justify-between">
+                          <div>
+                            <p className="text-[10px] text-orange-100 font-medium">Saldo KTM TapCash BNI</p>
+                            <p className="text-xl font-black">Rp 85.000</p>
+                          </div>
+                          <CreditCard className="w-8 h-8 opacity-80" />
+                        </div>
+                        <p className="font-bold text-slate-700">Pilih Nominal Top Up Instant:</p>
+                        <div className="grid grid-cols-3 gap-2">
+                          {[20000, 50000, 100000].map((amt) => (
+                            <button
+                              key={amt}
+                              onClick={() => {
+                                triggerToast(`💳 Top Up KTM TapCash Rp ${amt.toLocaleString('id-ID')} Berhasil!`);
+                                setActiveCampusSheet(null);
+                              }}
+                              className="py-2.5 rounded-xl bg-slate-100 hover:bg-orange-100 border border-slate-200 hover:border-orange-300 font-bold text-slate-800 text-xs"
+                            >
+                              Rp {amt.toLocaleString('id-ID')}
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+
+                    {activeCampusSheet === 'splitbill' && (
+                      <div className="space-y-3 text-xs">
+                        <div className="bg-teal-50 p-3 rounded-2xl border border-teal-200 space-y-1">
+                          <p className="font-bold text-teal-900">Patungan Warkop & Kafe Kampus</p>
+                          <p className="text-slate-600">Total Patungan: <b>Rp 150.000</b> (5 Mahasiswa @ Rp 30.000)</p>
+                        </div>
+                        <p className="font-bold text-slate-700">Teman Patungan Terpilih:</p>
+                        <div className="space-y-1.5 text-slate-600">
+                          <div className="flex justify-between bg-slate-50 p-2 rounded-lg"><span>Budi Santoso</span><span className="font-bold">Rp 30.000</span></div>
+                          <div className="flex justify-between bg-slate-50 p-2 rounded-lg"><span>Citra Lestari</span><span className="font-bold">Rp 30.000</span></div>
+                          <div className="flex justify-between bg-slate-50 p-2 rounded-lg"><span>Deni Pratama</span><span className="font-bold">Rp 30.000</span></div>
+                        </div>
+                        <button
+                          onClick={() => {
+                            triggerToast('🤝 Tagihan Split Bill disebar ke 4 Teman!');
+                            setActiveCampusSheet(null);
+                          }}
+                          className="w-full bg-[#00A396] hover:bg-teal-700 text-white font-bold text-xs py-2.5 rounded-xl shadow-xs"
+                        >
+                          Kirim Tagihan Split Bill
+                        </button>
+                      </div>
+                    )}
+
+                    {activeCampusSheet === 'ewallet' && (
+                      <div className="space-y-3 text-xs">
+                        <div className="bg-slate-50 p-3.5 rounded-2xl border border-slate-200/80 space-y-2">
+                          <p className="font-bold text-slate-800">Direct Link E-Wallet Connected:</p>
+                          <div className="space-y-1.5">
+                            <div className="p-2 rounded-xl bg-white border border-slate-200 flex justify-between items-center">
+                              <span className="font-bold text-slate-800">Gojek / GoPay ⚡</span>
+                              <span className="text-[10px] bg-emerald-100 text-emerald-700 font-bold px-2 py-0.5 rounded-full">Connected</span>
+                            </div>
+                            <div className="p-2 rounded-xl bg-white border border-slate-200 flex justify-between items-center">
+                              <span className="font-bold text-slate-800">Tokopedia / Shopee ⚡</span>
+                              <span className="text-[10px] bg-emerald-100 text-emerald-700 font-bold px-2 py-0.5 rounded-full">Connected</span>
+                            </div>
+                            <div className="p-2 rounded-xl bg-white border border-slate-200 flex justify-between items-center">
+                              <span className="font-bold text-slate-800">PLN Auto-Debit</span>
+                              <span className="text-[10px] bg-teal-100 text-teal-800 font-bold px-2 py-0.5 rounded-full">Aktif</span>
+                            </div>
+                          </div>
+                        </div>
+                        <button
+                          onClick={() => {
+                            triggerToast('🔗 Pengaturan Direct Link E-Wallet Diperbarui');
+                            setActiveCampusSheet(null);
+                          }}
+                          className="w-full bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs py-2.5 rounded-xl"
+                        >
+                          Kelola Hubungan Akun
+                        </button>
+                      </div>
+                    )}
+
+                    {activeCampusSheet === 'budgeting' && (
+                      <div className="space-y-3 text-xs">
+                        <div className="bg-slate-50 p-3 rounded-2xl border border-slate-200 space-y-2">
+                          <div className="flex items-center justify-between">
+                            <label className="text-xs font-bold text-slate-900">Atur Batas Pagu Harian/Bulanan</label>
+                            <span className="text-xs font-extrabold text-[#00A396] bg-[#E6FBF8] px-2 py-0.5 rounded-md border border-[#72DFD0]/40">
+                              Rp {student.dailyLimit.toLocaleString('id-ID')}
+                            </span>
+                          </div>
+                          <input
+                            type="range"
+                            min="10000"
+                            max="50000"
+                            step="5000"
+                            value={student.dailyLimit}
+                            onChange={handleLimitChange}
+                            className="w-full h-1.5 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-[#00A396]"
+                          />
+                          <div className="grid grid-cols-4 gap-1 pt-0.5">
+                            {[10000, 20000, 30000, 50000].map((preset) => (
+                              <button
+                                key={preset}
+                                onClick={() => {
+                                  setStudentsData(prev => ({
+                                    ...prev,
+                                    [selectedStudentId]: { ...prev[selectedStudentId], dailyLimit: preset }
+                                  }));
+                                  triggerToast(`Pagu diubah ke Rp ${preset.toLocaleString('id-ID')}`);
+                                }}
+                                className={`py-1 rounded-lg text-[10px] font-bold border transition-all ${
+                                  student.dailyLimit === preset ? 'bg-slate-900 text-white border-slate-900' : 'bg-slate-50 text-slate-600 border-slate-200'
+                                }`}
+                              >
+                                {preset / 1000}rb
+                              </button>
+                            ))}
+                          </div>
+                        </div>
+                        <button
+                          onClick={() => {
+                            triggerToast('✅ Batas Pagu Mandiri Disimpan!');
+                            setActiveCampusSheet(null);
+                          }}
+                          className="w-full bg-[#00A396] hover:bg-teal-700 text-white font-bold text-xs py-2.5 rounded-xl"
+                        >
+                          Simpan Batas Pagu
+                        </button>
+                      </div>
+                    )}
+
                   </div>
                 </div>
               )}
