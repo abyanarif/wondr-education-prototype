@@ -876,43 +876,237 @@ export default function App() {
                                 </div>
                               </div>
                             ) : (
-                              /* Sekolah Mode: Status SPP Widget */
-                              <div className="bg-white rounded-2xl border border-slate-200/80 shadow-xs overflow-hidden">
-                                <div className="bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900 p-3 text-white flex items-center justify-between">
-                                  <div className="flex items-center gap-2">
-                                    <div className="bg-[#72DFD0] text-slate-950 p-1 rounded-lg">
-                                      <Receipt className="w-3.5 h-3.5" />
+                              /* Sekolah Mode: Parent Control Hub (K-12 Mode) */
+                              <div className="space-y-3.5">
+                                {/* Card 2: Status Pembayaran SPP */}
+                                <div className="bg-white rounded-2xl border border-slate-200/80 shadow-xs overflow-hidden">
+                                  <div className="bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900 p-3 text-white flex items-center justify-between">
+                                    <div className="flex items-center gap-2">
+                                      <div className="bg-[#72DFD0] text-slate-950 p-1 rounded-lg">
+                                        <Receipt className="w-3.5 h-3.5" />
+                                      </div>
+                                      <h3 className="font-bold text-xs tracking-wide">Status Pembayaran SPP</h3>
                                     </div>
-                                    <h3 className="font-bold text-xs tracking-wide">Status Pembayaran SPP</h3>
+                                    <span className="text-[10px] text-[#72DFD0] font-bold">{student.sppPeriod}</span>
                                   </div>
-                                  <span className="text-[10px] text-[#72DFD0] font-bold">{student.sppPeriod}</span>
+
+                                  <div className="p-3 space-y-2.5">
+                                    <div className="flex items-center justify-between">
+                                      <div>
+                                        <p className="text-[10px] text-slate-500 font-medium">Tagihan SPP Bulanan</p>
+                                        <p className="text-lg font-extrabold text-slate-900">{student.sppAmount}</p>
+                                      </div>
+
+                                      <div className="flex flex-col items-end gap-0.5">
+                                        <span className="bg-emerald-500 text-white font-extrabold text-[11px] px-2.5 py-0.5 rounded-full flex items-center gap-1 shadow-xs">
+                                          <CheckCircle2 className="w-3 h-3" />
+                                          {student.sppStatus}
+                                        </span>
+                                        <span className="bg-[#E6FBF8] text-[#00A396] font-bold text-[9px] px-2 py-0.5 rounded-full flex items-center gap-1 border border-[#72DFD0]/40">
+                                          <RefreshCw className="w-2.5 h-2.5" />
+                                          Autodebit Aktif
+                                        </span>
+                                      </div>
+                                    </div>
+
+                                    <button
+                                      onClick={() => setShowReceiptModal(true)}
+                                      className="w-full bg-[#E6FBF8] hover:bg-[#72DFD0]/30 text-[#00897B] font-bold text-xs py-2 rounded-xl flex items-center justify-center gap-1.5 border border-[#72DFD0]/40 transition-colors"
+                                    >
+                                      <Receipt className="w-3.5 h-3.5" /> Lihat Bukti Bayar & Detail SPP
+                                    </button>
+                                  </div>
                                 </div>
 
-                                <div className="p-3 space-y-2.5">
+                                {/* Card 3: Pagu Harian & Kontrol Jajan Anak (Daily Pagu Slider & Budget Control) */}
+                                <div className="bg-white p-3.5 rounded-2xl border border-slate-200/80 shadow-xs space-y-3">
                                   <div className="flex items-center justify-between">
-                                    <div>
-                                      <p className="text-[10px] text-slate-500 font-medium">Tagihan SPP Bulanan</p>
-                                      <p className="text-lg font-extrabold text-slate-900">{student.sppAmount}</p>
+                                    <div className="flex items-center gap-2">
+                                      <div className="bg-[#D4F933] text-slate-950 p-1.5 rounded-xl">
+                                        <Sliders className="w-4 h-4" />
+                                      </div>
+                                      <div>
+                                        <h3 className="font-bold text-slate-900 text-xs">Pagu Harian & Kontrol Jajan Anak</h3>
+                                        <p className="text-[10px] text-slate-500 font-medium">Batas transaksi harian kartu jajan {student.name.split(' ')[0]}</p>
+                                      </div>
+                                    </div>
+                                    <span className="text-[9px] font-extrabold text-teal-800 bg-teal-50 px-2 py-0.5 rounded-full border border-teal-200">
+                                      NFC TapCash Active
+                                    </span>
+                                  </div>
+
+                                  {/* Dynamic Pagu Banner */}
+                                  <div className="bg-[#E6FBF8]/60 p-2.5 rounded-xl border border-[#72DFD0]/40 space-y-1.5">
+                                    <div className="flex items-center justify-between text-xs font-bold">
+                                      <span className="text-slate-700">Terpakai Hari Ini</span>
+                                      <span className="text-slate-900 font-extrabold text-xs">
+                                        Rp {student.spentToday.toLocaleString('id-ID')} / <span className="text-[#00A396]">Rp {student.dailyLimit.toLocaleString('id-ID')}</span>
+                                      </span>
                                     </div>
 
-                                    <div className="flex flex-col items-end gap-0.5">
-                                      <span className="bg-emerald-500 text-white font-extrabold text-[11px] px-2.5 py-0.5 rounded-full flex items-center gap-1 shadow-xs">
-                                        <CheckCircle2 className="w-3 h-3" />
-                                        {student.sppStatus}
-                                      </span>
-                                      <span className="bg-[#E6FBF8] text-[#00A396] font-bold text-[9px] px-2 py-0.5 rounded-full flex items-center gap-1 border border-[#72DFD0]/40">
-                                        <RefreshCw className="w-2.5 h-2.5" />
-                                        Autodebit Aktif
-                                      </span>
+                                    <div className="w-full h-2 bg-slate-200 rounded-full overflow-hidden p-0.5">
+                                      <div
+                                        className="h-full bg-gradient-to-r from-[#72DFD0] via-[#00B4A2] to-[#00A396] rounded-full transition-all duration-500"
+                                        style={{
+                                          width: `${Math.min(100, Math.round((student.spentToday / student.dailyLimit) * 100))}%`
+                                        }}
+                                      ></div>
+                                    </div>
+
+                                    <div className="flex items-center justify-between text-[10px] text-slate-700 font-semibold pt-0.5">
+                                      <span>SPP Lunas • Sisa Pagu Jajan {student.name.split(' ')[0]}: <b className="text-emerald-700">Rp {Math.max(0, student.dailyLimit - student.spentToday).toLocaleString('id-ID')} / Rp {student.dailyLimit.toLocaleString('id-ID')} (Hari Ini)</b></span>
                                     </div>
                                   </div>
 
-                                  <button
-                                    onClick={() => setShowReceiptModal(true)}
-                                    className="w-full bg-[#E6FBF8] hover:bg-[#72DFD0]/30 text-[#00897B] font-bold text-xs py-2 rounded-xl flex items-center justify-center gap-1.5 border border-[#72DFD0]/40 transition-colors"
-                                  >
-                                    <Receipt className="w-3.5 h-3.5" /> Lihat Bukti Bayar & Detail SPP
-                                  </button>
+                                  {/* Interactive Range Slider */}
+                                  <div className="space-y-2 pt-1 border-t border-slate-100">
+                                    <div className="flex items-center justify-between">
+                                      <label className="text-xs font-bold text-slate-900 flex items-center gap-1">
+                                        <Sliders className="w-3.5 h-3.5 text-[#00A396]" /> Atur Batas Pagu Harian
+                                      </label>
+                                      <span className="text-xs font-extrabold text-[#00A396] bg-[#E6FBF8] px-2 py-0.5 rounded-md border border-[#72DFD0]/40">
+                                        Rp {student.dailyLimit.toLocaleString('id-ID')}
+                                      </span>
+                                    </div>
+
+                                    <input
+                                      type="range"
+                                      min="10000"
+                                      max="50000"
+                                      step="5000"
+                                      value={student.dailyLimit}
+                                      onChange={handleLimitChange}
+                                      className="w-full h-1.5 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-[#00A396]"
+                                    />
+
+                                    <div className="grid grid-cols-4 gap-1 pt-0.5">
+                                      {[10000, 20000, 30000, 50000].map((preset) => (
+                                        <button
+                                          key={preset}
+                                          onClick={() => {
+                                            setStudentsData(prev => ({
+                                              ...prev,
+                                              [selectedStudentId]: { ...prev[selectedStudentId], dailyLimit: preset }
+                                            }));
+                                            triggerToast(`Pagu Jajan ${student.name.split(' ')[0]} diubah ke Rp ${preset.toLocaleString('id-ID')}`);
+                                          }}
+                                          className={`py-1 rounded-lg text-[10px] font-bold border transition-all ${
+                                            student.dailyLimit === preset ? 'bg-slate-900 text-white border-slate-900' : 'bg-slate-50 text-slate-600 border-slate-200'
+                                          }`}
+                                        >
+                                          {preset / 1000}rb
+                                        </button>
+                                      ))}
+                                    </div>
+                                  </div>
+                                </div>
+
+                                {/* Card 4: Request Uang Saku & Transaksi Kantin Terakhir */}
+                                <div className="bg-white p-3.5 rounded-2xl border border-slate-200/80 shadow-xs space-y-3">
+                                  {/* Request Top-Up Widget */}
+                                  <div className="bg-amber-50/80 p-3 rounded-xl border border-amber-200/80 space-y-2">
+                                    <div className="flex items-center justify-between">
+                                      <span className="font-extrabold text-amber-900 text-xs flex items-center gap-1.5">
+                                        <Bell className="w-3.5 h-3.5 text-amber-600" /> 📩 Request Uang Saku / Top-Up (1 Pending)
+                                      </span>
+                                      <span className="text-[9px] bg-amber-500 text-slate-950 font-black px-2 py-0.5 rounded-full uppercase">NEW</span>
+                                    </div>
+                                    <p className="text-[11px] text-slate-700 leading-snug">
+                                      <b>{student.name.split(' ')[0]}</b> meminta tambahan pagu <b>Rp 10.000</b> untuk jajan ekstrakurikuler sore ini.
+                                    </p>
+                                    <button
+                                      onClick={() => {
+                                        setStudentsData(prev => ({
+                                          ...prev,
+                                          [selectedStudentId]: { ...prev[selectedStudentId], dailyLimit: prev[selectedStudentId].dailyLimit + 10000 }
+                                        }));
+                                        triggerToast(`✅ Permintaan Top-Up Rp 10.000 disetujui! Pagu ${student.name.split(' ')[0]} bertambah!`);
+                                      }}
+                                      className="w-full bg-amber-500 hover:bg-amber-600 text-slate-950 font-extrabold text-xs py-1.5 rounded-xl shadow-xs transition-colors flex items-center justify-center gap-1.5"
+                                    >
+                                      <CheckCircle2 className="w-3.5 h-3.5" /> Approve Top-Up Instant (Rp 10.000)
+                                    </button>
+                                  </div>
+
+                                  {/* Transaksi Kantin Terakhir */}
+                                  <div className="space-y-2 pt-1 border-t border-slate-100">
+                                    <div className="flex items-center justify-between">
+                                      <h4 className="font-bold text-slate-900 text-xs flex items-center gap-1.5">
+                                        <Utensils className="w-3.5 h-3.5 text-[#00A396]" /> Transaksi Kantin Terakhir {student.name.split(' ')[0]}
+                                      </h4>
+                                      <span className="text-[10px] text-slate-400 font-semibold">TapCash NFC</span>
+                                    </div>
+
+                                    <div className="space-y-1.5">
+                                      {student.canteenHistory.map((item) => (
+                                        <div key={item.id} className="flex items-center justify-between p-2.5 rounded-xl bg-slate-50 border border-slate-100 text-xs">
+                                          <div className="flex items-center gap-2.5">
+                                            <div className="w-7 h-7 rounded-lg flex items-center justify-center bg-teal-100 text-[#00A396] shrink-0">
+                                              <Utensils className="w-3.5 h-3.5" />
+                                            </div>
+                                            <div>
+                                              <p className="font-bold text-slate-900 text-xs">{item.title}</p>
+                                              <p className="text-[10px] text-slate-500">{item.time} • TapCash Kartu Jajan</p>
+                                            </div>
+                                          </div>
+                                          <span className="font-extrabold text-slate-900 text-xs">-Rp {item.price.toLocaleString('id-ID')}</span>
+                                        </div>
+                                      ))}
+                                    </div>
+                                  </div>
+                                </div>
+
+                                {/* Card 5: Quick Action Grid / Buttons */}
+                                <div className="bg-white p-3 rounded-2xl border border-slate-200/80 shadow-xs space-y-2">
+                                  <h3 className="font-bold text-slate-900 text-xs flex items-center gap-1.5">
+                                    <Sparkles className="w-3.5 h-3.5 text-[#00A396]" /> Aksi Cepat Kontrol Orang Tua
+                                  </h3>
+
+                                  <div className="grid grid-cols-3 gap-2">
+                                    <button
+                                      onClick={() => triggerToast(`⚙️ Gunakan slider di atas untuk mengatur limit pagu ${student.name.split(' ')[0]}`)}
+                                      className="p-2 rounded-xl bg-teal-50 hover:bg-teal-100/80 border border-teal-200 text-center transition-colors"
+                                    >
+                                      <Sliders className="w-4 h-4 text-[#00A396] mx-auto mb-1" />
+                                      <span className="font-extrabold text-[10px] text-teal-900 block leading-tight">Atur Limit Jajan</span>
+                                    </button>
+
+                                    <button
+                                      onClick={() => triggerToast(`💳 Top-Up Pagu Instant Rp 20.000 ke Kartu Jajan ${student.name.split(' ')[0]} Berhasil!`)}
+                                      className="p-2 rounded-xl bg-orange-50 hover:bg-orange-100/80 border border-orange-200 text-center transition-colors"
+                                    >
+                                      <CreditCard className="w-4 h-4 text-orange-600 mx-auto mb-1" />
+                                      <span className="font-extrabold text-[10px] text-orange-900 block leading-tight">Top-Up Pagu Instant</span>
+                                    </button>
+
+                                    <button
+                                      onClick={() => triggerToast(`📜 Menampilkan Log Transaksi Kantin Lengkap ${student.name.split(' ')[0]}`)}
+                                      className="p-2 rounded-xl bg-cyan-50 hover:bg-cyan-100/80 border border-cyan-200 text-center transition-colors"
+                                    >
+                                      <Utensils className="w-4 h-4 text-cyan-700 mx-auto mb-1" />
+                                      <span className="font-extrabold text-[10px] text-cyan-900 block leading-tight">Lihat Transaksi Kantin</span>
+                                    </button>
+                                  </div>
+                                </div>
+
+                                {/* Card 6: Reward Banner */}
+                                <div
+                                  onClick={() => setShowKprModal(true)}
+                                  className="bg-gradient-to-br from-amber-500/10 via-amber-50 to-emerald-500/10 p-3 rounded-2xl border border-amber-300/60 shadow-xs cursor-pointer hover:border-amber-400"
+                                >
+                                  <div className="flex items-start gap-2.5">
+                                    <div className="w-8 h-8 rounded-xl bg-amber-500 text-slate-950 flex items-center justify-center shrink-0 font-bold">
+                                      <Sparkles className="w-4 h-4 text-slate-950" />
+                                    </div>
+                                    <div className="space-y-0.5">
+                                      <span className="text-amber-800 font-extrabold text-xs block">
+                                        🌟 Reward Kedisiplinan SPP BNI
+                                      </span>
+                                      <p className="text-[11px] text-slate-800 font-semibold leading-snug">
+                                        Anda berhak mendapatkan <span className="text-[#00897B] font-bold underline">KPR Flexi BNI Bunga 2.75%</span> Pre-Approved!
+                                      </p>
+                                    </div>
+                                  </div>
                                 </div>
                               </div>
                             )}
