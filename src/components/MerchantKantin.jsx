@@ -127,8 +127,12 @@ export default function MerchantKantin({
       const student = studentsData[studentId];
       const remainingAllowance = student.dailyLimit - student.spentToday;
 
+      // Emergency Overdraft Protection Logic
+      const isEmergencyEnabled = student.emergencyAutoApprove !== false && student.parentApprovalMode !== 'strict';
+      const overdraftNeeded = cartTotal - remainingAllowance;
+
       if (remainingAllowance >= cartTotal) {
-        // Success Checkout
+        // Success Checkout Normal
         const newSpent = student.spentToday + cartTotal;
         const newRemaining = student.dailyLimit - newSpent;
         const itemsSummary = cartItems.map((i) => `${i.name} (${i.quantity}x)`).join(', ');
@@ -148,9 +152,39 @@ export default function MerchantKantin({
 
         setTapResult({
           status: 'success',
+          isEmergencyOverdraft: false,
           student,
           remainingAllowance,
           newRemaining,
+          cartTotal,
+          itemsSummary,
+          trxId
+        });
+      } else if (isEmergencyEnabled && overdraftNeeded <= 15000) {
+        // Approved via Emergency Overdraft!
+        const newSpent = student.spentToday + cartTotal;
+        const itemsSummary = cartItems.map((i) => `${i.name} (${i.quantity}x)`).join(', ');
+        const trxId = 'TRX-EMG-' + Math.floor(100000 + Math.random() * 900000);
+
+        onProcessTransaction({
+          studentId,
+          amount: cartTotal,
+          itemSummary: itemsSummary,
+          cartItems
+        });
+
+        // Push real-time emergency notification
+        onTriggerNotification(
+          `⚡ Approved via Emergency Overdraft: Transaksi Kantin ${student.name} (Rp ${cartTotal.toLocaleString('id-ID')}) disetujui otomatis (Overdraft Rp ${overdraftNeeded.toLocaleString('id-ID')})`
+        );
+
+        setTapResult({
+          status: 'success',
+          isEmergencyOverdraft: true,
+          overdraftAmount: overdraftNeeded,
+          student,
+          remainingAllowance,
+          newRemaining: Math.max(0, student.dailyLimit - newSpent),
           cartTotal,
           itemsSummary,
           trxId
@@ -161,7 +195,8 @@ export default function MerchantKantin({
           status: 'error',
           student,
           remainingAllowance,
-          cartTotal
+          cartTotal,
+          overdraftNeeded
         });
       }
     }, 600);
@@ -501,13 +536,21 @@ export default function MerchantKantin({
             {/* Tap Result: SUCCESS SCREEN */}
             {!isScanning && tapResult?.status === 'success' && (
               <div className="space-y-4 text-center animate-in zoom-in-95 duration-200">
-                <div className="w-16 h-16 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center mx-auto shadow-inner border-2 border-emerald-400 animate-bounce">
+                <div className={`w-16 h-16 rounded-full flex items-center justify-center mx-auto shadow-inner border-2 animate-bounce ${
+                  tapResult.isEmergencyOverdraft
+                    ? 'bg-amber-100 text-amber-600 border-amber-400'
+                    : 'bg-emerald-100 text-emerald-600 border-emerald-400'
+                }`}>
                   <CheckCircle2 className="w-10 h-10" />
                 </div>
 
                 <div>
-                  <h4 className="font-black text-emerald-600 text-lg">Pembayaran Berhasil!</h4>
-                  <p className="text-xs text-slate-600 font-semibold mt-0.5">NFC / BNI Junior Disetujui</p>
+                  <h4 className={`font-black text-lg ${tapResult.isEmergencyOverdraft ? 'text-amber-700' : 'text-emerald-600'}`}>
+                    {tapResult.isEmergencyOverdraft ? 'Disetujui via Emergency Overdraft!' : 'Pembayaran Berhasil!'}
+                  </h4>
+                  <p className="text-xs text-slate-600 font-semibold mt-0.5">
+                    {tapResult.isEmergencyOverdraft ? 'BNI Emergency Overdraft Protect Active' : 'NFC / BNI Junior Disetujui'}
+                  </p>
                 </div>
 
                 {/* Student Photo & Result Info Card */}
@@ -521,9 +564,15 @@ export default function MerchantKantin({
                     <div>
                       <h5 className="font-extrabold text-slate-900 text-xs">{tapResult.student.name}</h5>
                       <p className="text-[10px] text-slate-500">{tapResult.student.grade} • {tapResult.student.school}</p>
-                      <span className="inline-block mt-0.5 bg-emerald-100 text-emerald-800 text-[9px] font-bold px-1.5 py-0.2 rounded">
-                        Kartu BNI Junior Valid
-                      </span>
+                      {tapResult.isEmergencyOverdraft ? (
+                        <span className="inline-block mt-0.5 bg-amber-500 text-slate-950 text-[9px] font-black px-2 py-0.5 rounded-full uppercase shadow-xs">
+                          ⚡ Approved via Emergency Overdraft
+                        </span>
+                      ) : (
+                        <span className="inline-block mt-0.5 bg-emerald-100 text-emerald-800 text-[9px] font-bold px-1.5 py-0.2 rounded">
+                          Kartu BNI Junior Valid
+                        </span>
+                      )}
                     </div>
                   </div>
 
@@ -536,6 +585,12 @@ export default function MerchantKantin({
                       <span>Sisa Pagu Sebelum:</span>
                       <span className="font-medium text-slate-700">Rp {tapResult.remainingAllowance.toLocaleString('id-ID')}</span>
                     </div>
+                    {tapResult.isEmergencyOverdraft && (
+                      <div className="flex justify-between text-amber-800 font-bold">
+                        <span>Dana Overdraft Dipakai:</span>
+                        <span>Rp {tapResult.overdraftAmount.toLocaleString('id-ID')}</span>
+                      </div>
+                    )}
                     <div className="flex justify-between pt-1 border-t border-slate-200">
                       <span className="font-bold text-slate-700">Sisa Pagu Sekarang:</span>
                       <span className="font-black text-emerald-700 text-xs">
@@ -544,9 +599,15 @@ export default function MerchantKantin({
                     </div>
                   </div>
 
-                  <div className="bg-emerald-50 text-emerald-800 p-2 rounded-xl text-[10px] font-bold text-center border border-emerald-200">
-                    ✓ Notifikasi otomatis dikirim ke aplikasi wondr orang tua
-                  </div>
+                  {tapResult.isEmergencyOverdraft ? (
+                    <div className="bg-amber-50 text-amber-900 p-2 rounded-xl text-[10px] font-bold text-center border border-amber-300">
+                      ⚡ Disetujui Otomatis via BNI Emergency Overdraft Protect (Max Rp 15.000)
+                    </div>
+                  ) : (
+                    <div className="bg-emerald-50 text-emerald-800 p-2 rounded-xl text-[10px] font-bold text-center border border-emerald-200">
+                      ✓ Notifikasi otomatis dikirim ke aplikasi wondr orang tua
+                    </div>
+                  )}
                 </div>
 
                 <button

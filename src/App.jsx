@@ -999,6 +999,43 @@ export default function App() {
                                       ))}
                                     </div>
                                   </div>
+
+                                  {/* Emergency Auto-Approval Toggle Switch */}
+                                  <div className="bg-slate-50 p-2.5 rounded-xl border border-slate-200/80 flex items-center justify-between mt-2">
+                                    <div className="space-y-0.5 pr-2">
+                                      <div className="flex items-center gap-1.5">
+                                        <span className="font-extrabold text-slate-900 text-xs">Emergency Auto-Approve Canteen</span>
+                                        <span className={`text-[8px] font-black px-1.5 py-0.2 rounded-md uppercase ${
+                                          student.emergencyAutoApprove !== false
+                                            ? 'bg-emerald-500 text-white'
+                                            : 'bg-slate-300 text-slate-700'
+                                        }`}>
+                                          {student.emergencyAutoApprove !== false ? 'ON' : 'OFF'}
+                                        </span>
+                                      </div>
+                                      <p className="text-[9.5px] text-slate-500 font-medium leading-tight">
+                                        Auto-approve max Rp15.000/day if parent is unresponsive for 30s
+                                      </p>
+                                    </div>
+
+                                    <button
+                                      onClick={() => {
+                                        const newState = student.emergencyAutoApprove === false;
+                                        setStudentsData(prev => ({
+                                          ...prev,
+                                          [selectedStudentId]: { ...prev[selectedStudentId], emergencyAutoApprove: newState }
+                                        }));
+                                        triggerToast(newState ? '⚡ Emergency Auto-Approve Diaktifkan (Max Rp 15.000 Overdraft)' : '🔒 Emergency Auto-Approve Dimatikan');
+                                      }}
+                                      className={`w-10 h-5.5 rounded-full p-0.5 transition-colors relative flex items-center shrink-0 ${
+                                        student.emergencyAutoApprove !== false ? 'bg-[#00A396]' : 'bg-slate-300'
+                                      }`}
+                                    >
+                                      <div className={`w-4.5 h-4.5 rounded-full bg-white shadow-md transform transition-transform ${
+                                        student.emergencyAutoApprove !== false ? 'translate-x-4.5' : 'translate-x-0'
+                                      }`} />
+                                    </button>
+                                  </div>
                                 </div>
 
                                 {/* Card 4: Request Uang Saku & Transaksi Kantin Terakhir */}
@@ -1897,14 +1934,67 @@ export default function App() {
                             ))}
                           </div>
                         </div>
+
+                        {/* Selection Rule: Strict Mode vs Flexi Canteen Mode */}
+                        <div className="space-y-2 pt-1 border-t border-slate-200">
+                          <p className="font-extrabold text-slate-900 text-xs">Aturan Persetujuan Transaksi Jajan:</p>
+                          <div className="grid grid-cols-2 gap-2">
+                            <button
+                              onClick={() => {
+                                setStudentsData(prev => ({
+                                  ...prev,
+                                  [selectedStudentId]: { ...prev[selectedStudentId], parentApprovalMode: 'strict', emergencyAutoApprove: false }
+                                }));
+                                triggerToast('🔒 Mode Persetujuan Diubah ke Strict Mode');
+                              }}
+                              className={`p-2.5 rounded-xl border text-left space-y-1 transition-all ${
+                                student.parentApprovalMode === 'strict'
+                                  ? 'border-slate-900 bg-slate-900 text-white shadow-xs'
+                                  : 'border-slate-200 bg-slate-50 text-slate-800 hover:bg-slate-100'
+                              }`}
+                            >
+                              <div className="flex items-center justify-between">
+                                <span className="font-extrabold text-xs">Strict Mode</span>
+                                <span className={`text-[8px] font-bold px-1.5 py-0.5 rounded ${student.parentApprovalMode === 'strict' ? 'bg-white/20 text-white' : 'bg-slate-200 text-slate-700'}`}>Manual</span>
+                              </div>
+                              <p className={`text-[9px] leading-tight ${student.parentApprovalMode === 'strict' ? 'text-slate-300' : 'text-slate-500'}`}>
+                                Memerlukan persetujuan manual orang tua untuk semua pengajuan jajan tambahan.
+                              </p>
+                            </button>
+
+                            <button
+                              onClick={() => {
+                                setStudentsData(prev => ({
+                                  ...prev,
+                                  [selectedStudentId]: { ...prev[selectedStudentId], parentApprovalMode: 'flexi', emergencyAutoApprove: true }
+                                }));
+                                triggerToast('⚡ Mode Persetujuan Diubah ke Flexi Canteen Mode');
+                              }}
+                              className={`p-2.5 rounded-xl border text-left space-y-1 transition-all ${
+                                student.parentApprovalMode !== 'strict'
+                                  ? 'border-[#00A396] bg-[#E6FBF8] text-slate-900 shadow-xs'
+                                  : 'border-slate-200 bg-slate-50 text-slate-800 hover:bg-slate-100'
+                              }`}
+                            >
+                              <div className="flex items-center justify-between">
+                                <span className="font-extrabold text-xs text-[#00897B]">Flexi Canteen Mode</span>
+                                <span className="text-[8px] bg-emerald-500 text-white font-bold px-1.5 py-0.5 rounded">Auto-Approve</span>
+                              </div>
+                              <p className="text-[9px] text-slate-600 leading-tight">
+                                Menyetujui otomatis transaksi kantin hingga batas Emergency Overdraft (Max Rp15.000).
+                              </p>
+                            </button>
+                          </div>
+                        </div>
+
                         <button
                           onClick={() => {
-                            triggerToast('✅ Batas Pagu Mandiri Disimpan!');
+                            triggerToast('✅ Batas Pagu & Mode Persetujuan Disimpan!');
                             setActiveCampusSheet(null);
                           }}
                           className="w-full bg-[#00A396] hover:bg-teal-700 text-white font-bold text-xs py-2.5 rounded-xl"
                         >
-                          Simpan Batas Pagu
+                          Simpan Batas Pagu & Mode
                         </button>
                       </div>
                     )}

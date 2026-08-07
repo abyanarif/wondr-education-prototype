@@ -15,6 +15,8 @@ export const initialStudentsData = {
     autoDebitDate: 'Tanggal 10 setiap bulan',
     spentToday: 12000,
     dailyLimit: 20000,
+    emergencyAutoApprove: true,
+    parentApprovalMode: 'flexi',
     canteenHistory: [
       { id: 101, title: 'Soto Ayam Kantin Utama', time: '10:15 WIB', price: 12000, status: 'Berhasil' }
     ]
@@ -35,6 +37,8 @@ export const initialStudentsData = {
     autoDebitDate: 'Tanggal 10 setiap bulan',
     spentToday: 8000,
     dailyLimit: 15000,
+    emergencyAutoApprove: true,
+    parentApprovalMode: 'flexi',
     canteenHistory: [
       { id: 201, title: 'Roti & Susu Kantin SMP', time: '09:45 WIB', price: 8000, status: 'Berhasil' }
     ]
