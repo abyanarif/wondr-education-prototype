@@ -27,7 +27,15 @@ import {
   Building2,
   Smartphone,
   Link2,
-  Trophy
+  Trophy,
+  Home,
+  PieChart,
+  TrendingUp,
+  User,
+  ArrowLeftRight,
+  Check,
+  Download,
+  Share2
 } from 'lucide-react';
 
 import { initialStudentsData } from './dummyData';
@@ -362,60 +370,9 @@ export default function App() {
                 </div>
               </div>
 
-              {/* Header Mode Switcher Pill */}
-              <div className="bg-slate-900 px-3.5 py-2 flex items-center justify-between text-xs border-b border-slate-800 shrink-0 z-30">
-                <div className="flex items-center gap-1 bg-slate-800/90 p-0.5 rounded-xl border border-slate-700">
-                  <button
-                    onClick={() => {
-                      setCurrentMode('sekolah');
-                      triggerToast('Mode Aktif: Mode Sekolah (K-12)');
-                    }}
-                    className={`px-2.5 py-1 rounded-lg text-[10px] font-extrabold transition-all ${
-                      currentMode === 'sekolah'
-                        ? 'bg-[#72DFD0] text-slate-950 shadow-xs'
-                        : 'text-slate-400 hover:text-white'
-                    }`}
-                  >
-                    🎒 Sekolah (K-12)
-                  </button>
-                  <button
-                    onClick={() => {
-                      setCurrentMode('kampus');
-                      triggerToast('Mode Aktif: Mode Kampus (University)');
-                    }}
-                    className={`px-2.5 py-1 rounded-lg text-[10px] font-extrabold transition-all ${
-                      currentMode === 'kampus'
-                        ? 'bg-[#72DFD0] text-slate-950 shadow-xs'
-                        : 'text-slate-400 hover:text-white'
-                    }`}
-                  >
-                    🎓 Kampus (Univ)
-                  </button>
-                </div>
-
-                <div className="flex items-center gap-1.5 text-white text-[11px] font-bold">
-                  {appMode === 'parent' && (
-                    currentMode === 'kampus' ? (
-                      <span className="text-[#72DFD0] flex items-center gap-1">
-                        <GraduationCap className="w-3.5 h-3.5" /> Student Hub
-                      </span>
-                    ) : (
-                      <span className="text-[#72DFD0] flex items-center gap-1">
-                        <Smartphone className="w-3.5 h-3.5" /> Parent Hub
-                      </span>
-                    )
-                  )}
-                  {appMode === 'merchant' && (
-                    <span className="text-amber-400 flex items-center gap-1">
-                      <Store className="w-3.5 h-3.5" /> POS Kantin
-                    </span>
-                  )}
-                </div>
-              </div>
-
               {/* PUSH NOTIFICATION BANNER */}
               {pushNotification && (
-                <div className="absolute top-14 left-3 right-3 bg-slate-900/95 text-white text-xs font-semibold p-3 rounded-2xl shadow-2xl z-50 border border-emerald-500/50 animate-in slide-in-from-top-4 duration-300 flex items-start gap-2.5">
+                <div className="absolute top-10 left-3 right-3 bg-slate-900/95 text-white text-xs font-semibold p-3 rounded-2xl shadow-2xl z-50 border border-emerald-500/50 animate-in slide-in-from-top-4 duration-300 flex items-start gap-2.5">
                   <div className="w-7 h-7 rounded-xl bg-emerald-500 text-slate-950 flex items-center justify-center shrink-0 font-bold mt-0.5">
                     <Utensils className="w-4 h-4" />
                   </div>
@@ -431,7 +388,7 @@ export default function App() {
 
               {/* TOAST ALERT OVERLAY */}
               {toastMessage && (
-                <div className="absolute top-14 left-4 right-4 bg-slate-900/95 text-white text-xs font-medium py-3 px-4 rounded-2xl shadow-2xl z-50 flex items-center justify-between border border-slate-700 animate-in fade-in duration-300">
+                <div className="absolute top-10 left-4 right-4 bg-slate-900/95 text-white text-xs font-medium py-3 px-4 rounded-2xl shadow-2xl z-50 flex items-center justify-between border border-slate-700 animate-in fade-in duration-300">
                   <div className="flex items-center gap-2">
                     <div className="w-2 h-2 rounded-full bg-[#72DFD0] animate-ping"></div>
                     <span>{toastMessage}</span>
@@ -553,13 +510,13 @@ export default function App() {
 
                             <div>
                               <div className="flex items-center gap-2 text-orange-100 text-xs font-medium">
-                                <span>Total Saldo Mahasiswa</span>
+                                <span>{currentMode === 'kampus' ? 'Saldo Tabungan Mahasiswa' : 'Saldo Rekening Utama'}</span>
                                 <button onClick={() => setShowBalance(!showBalance)} className="hover:text-white">
                                   {showBalance ? <Eye className="w-3.5 h-3.5" /> : <EyeOff className="w-3.5 h-3.5" />}
                                 </button>
                               </div>
                               <p className="text-2xl font-black tracking-tight mt-0.5">
-                                {showBalance ? (currentMode === 'kampus' ? 'Rp4.850.000' : 'Rp2.800.000.000') : '••••••••••••'}
+                                {showBalance ? (currentMode === 'kampus' ? 'Rp4.850.000' : 'Rp28.000.000') : '••••••••••••'}
                               </p>
                             </div>
 
@@ -657,7 +614,7 @@ export default function App() {
                               <p className="text-[11px] text-slate-300 mt-0.5">
                                 {currentMode === 'kampus'
                                   ? `UKT Semester 5 Lunas • Rp 6.500.000 [LUNAS via wondr]`
-                                  : `SPP Lunas • Sisa Pagu ${student.name.split(' ')[0]}: Rp ${(student.dailyLimit - student.spentToday).toLocaleString('id-ID')}`}
+                                  : `SPP Lunas • Sisa Pagu Jajan ${student.name.split(' ')[0]}: Rp${(student.dailyLimit - student.spentToday).toLocaleString('id-ID')} / Rp${student.dailyLimit.toLocaleString('id-ID')} (Hari Ini)`}
                               </p>
                             </div>
                           </div>
@@ -1069,55 +1026,54 @@ export default function App() {
 
               </div>
 
-              {/* Bottom Nav Bar */}
-              <div className="bg-white/95 backdrop-blur-md border-t border-slate-200/80 px-4 py-2.5 flex items-center justify-around z-30 relative shrink-0">
+              {/* Bottom Nav Bar - Genuine wondr retail style */}
+              <div className="bg-white/95 backdrop-blur-md border-t border-slate-200/80 px-2 py-2 flex items-center justify-around z-30 relative shrink-0">
                 <button
                   onClick={() => { setAppMode('parent'); setCurrentScreen('home'); }}
-                  className={`flex flex-col items-center gap-1 ${
-                    appMode === 'parent' && currentScreen === 'home' ? 'text-[#00A396]' : 'text-slate-400'
+                  className={`flex flex-col items-center gap-1 py-1 px-2.5 rounded-xl transition-all ${
+                    appMode === 'parent' && currentScreen === 'home' ? 'text-[#00A396] font-bold' : 'text-slate-400 hover:text-slate-600'
                   }`}
                 >
-                  <Send className="w-5 h-5" />
-                  <span className="text-[10px] font-bold">Home</span>
+                  <Home className="w-5 h-5" />
+                  <span className="text-[10px]">Home</span>
                 </button>
 
                 <button
-                  onClick={() => { setAppMode('parent'); setCurrentScreen('education'); }}
-                  className={`flex flex-col items-center gap-1 ${
-                    appMode === 'parent' && currentScreen === 'education' ? 'text-[#00A396]' : 'text-slate-400'
+                  onClick={() => { setAppMode('parent'); setCurrentScreen('home'); setActiveTab('transaksi'); triggerToast('Menu Transaksi Active'); }}
+                  className={`flex flex-col items-center gap-1 py-1 px-2.5 rounded-xl transition-all ${
+                    appMode === 'parent' && activeTab === 'transaksi' && currentScreen === 'home' ? 'text-[#00A396] font-bold' : 'text-slate-400 hover:text-slate-600'
                   }`}
                 >
-                  <GraduationCap className="w-5 h-5" />
-                  <span className="text-[10px] font-bold">{currentMode === 'kampus' ? 'Student Hub' : 'Parent Hub'}</span>
-                </button>
-
-                <div className="relative -top-5">
-                  <button
-                    onClick={() => triggerToast('Fitur Scan QRIS Siap')}
-                    className="w-14 h-14 bg-slate-950 rounded-full flex flex-col items-center justify-center border-4 border-[#F8FAFC] shadow-xl text-white active:scale-95 transition-transform"
-                  >
-                    <img src="/assets/qris-icon.svg" alt="QRIS" className="w-7 h-7 object-contain" />
-                  </button>
-                </div>
-
-                <button
-                  onClick={() => setAppMode('merchant')}
-                  className={`flex flex-col items-center gap-1 ${
-                    appMode === 'merchant' ? 'text-[#F37021] font-bold' : 'text-slate-400'
-                  }`}
-                >
-                  <Store className="w-5 h-5" />
-                  <span className="text-[10px] font-bold">POS Kantin</span>
+                  <ArrowLeftRight className="w-5 h-5" />
+                  <span className="text-[10px]">Transaksi</span>
                 </button>
 
                 <button
-                  onClick={() => setAppMode('treasury')}
-                  className={`flex flex-col items-center gap-1 ${
-                    appMode === 'treasury' ? 'text-teal-600 font-bold' : 'text-slate-400'
+                  onClick={() => { setAppMode('parent'); setCurrentScreen('home'); setActiveTab('insights'); triggerToast('Menu Insight Active'); }}
+                  className={`flex flex-col items-center gap-1 py-1 px-2.5 rounded-xl transition-all ${
+                    appMode === 'parent' && activeTab === 'insights' && currentScreen === 'home' ? 'text-[#00A396] font-bold' : 'text-slate-400 hover:text-slate-600'
                   }`}
                 >
-                  <Building2 className="w-5 h-5" />
-                  <span className="text-[10px] font-bold">B2B Portal</span>
+                  <PieChart className="w-5 h-5" />
+                  <span className="text-[10px]">Insight</span>
+                </button>
+
+                <button
+                  onClick={() => { setAppMode('parent'); setCurrentScreen('home'); setActiveTab('growth'); triggerToast('Menu Growth Active'); }}
+                  className={`flex flex-col items-center gap-1 py-1 px-2.5 rounded-xl transition-all ${
+                    appMode === 'parent' && activeTab === 'growth' && currentScreen === 'home' ? 'text-[#00A396] font-bold' : 'text-slate-400 hover:text-slate-600'
+                  }`}
+                >
+                  <TrendingUp className="w-5 h-5" />
+                  <span className="text-[10px]">Growth</span>
+                </button>
+
+                <button
+                  onClick={() => triggerToast(currentMode === 'kampus' ? 'Profil Mahasiswa: Akbar Putra' : 'Profil Utama: Ibu Karnisa')}
+                  className="flex flex-col items-center gap-1 py-1 px-2.5 rounded-xl transition-all text-slate-400 hover:text-slate-600"
+                >
+                  <User className="w-5 h-5" />
+                  <span className="text-[10px] font-bold">Profile</span>
                 </button>
               </div>
 
