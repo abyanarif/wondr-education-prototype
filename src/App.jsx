@@ -1935,17 +1935,20 @@ export default function App() {
                           </div>
                         </div>
 
-                        {/* Selection Rule: Strict Mode vs Flexi Canteen Mode */}
+                        {/* Selection Rule: Mode Persetujuan (Sekolah) vs Mode Budgeting Mandiri (Kampus) */}
                         <div className="space-y-2 pt-1 border-t border-slate-200">
-                          <p className="font-extrabold text-slate-900 text-xs">Aturan Persetujuan Transaksi Jajan:</p>
+                          <p className="font-extrabold text-slate-900 text-xs">
+                            {currentMode === 'kampus' ? 'Aturan Disiplin Budgeting Mandiri:' : 'Aturan Persetujuan Transaksi Jajan (Orang Tua):'}
+                          </p>
                           <div className="grid grid-cols-2 gap-2">
+                            {/* Option A: Strict Mode */}
                             <button
                               onClick={() => {
                                 setStudentsData(prev => ({
                                   ...prev,
                                   [selectedStudentId]: { ...prev[selectedStudentId], parentApprovalMode: 'strict', emergencyAutoApprove: false }
                                 }));
-                                triggerToast('🔒 Mode Persetujuan Diubah ke Strict Mode');
+                                triggerToast(currentMode === 'kampus' ? '🔒 Strict Mode (Auto-Lock) Aktif' : '🔒 Strict Mode (Manual Approval) Aktif');
                               }}
                               className={`p-2.5 rounded-xl border text-left space-y-1 transition-all ${
                                 student.parentApprovalMode === 'strict'
@@ -1954,21 +1957,28 @@ export default function App() {
                               }`}
                             >
                               <div className="flex items-center justify-between">
-                                <span className="font-extrabold text-xs">Strict Mode</span>
-                                <span className={`text-[8px] font-bold px-1.5 py-0.5 rounded ${student.parentApprovalMode === 'strict' ? 'bg-white/20 text-white' : 'bg-slate-200 text-slate-700'}`}>Manual</span>
+                                <span className="font-extrabold text-xs">
+                                  {currentMode === 'kampus' ? 'Strict Mode (Auto-Lock)' : 'Strict Mode (Manual)'}
+                                </span>
+                                <span className={`text-[8px] font-bold px-1.5 py-0.5 rounded ${student.parentApprovalMode === 'strict' ? 'bg-white/20 text-white' : 'bg-slate-200 text-slate-700'}`}>
+                                  {currentMode === 'kampus' ? 'Disiplin' : 'Manual'}
+                                </span>
                               </div>
                               <p className={`text-[9px] leading-tight ${student.parentApprovalMode === 'strict' ? 'text-slate-300' : 'text-slate-500'}`}>
-                                Memerlukan persetujuan manual orang tua untuk semua pengajuan jajan tambahan.
+                                {currentMode === 'kampus'
+                                  ? 'Blokir otomatis transaksi harian jika batas pagu habis untuk menjaga target tabungan.'
+                                  : 'Memerlukan persetujuan manual orang tua untuk semua pengajuan jajan tambahan.'}
                               </p>
                             </button>
 
+                            {/* Option B: Flexi Mode */}
                             <button
                               onClick={() => {
                                 setStudentsData(prev => ({
                                   ...prev,
                                   [selectedStudentId]: { ...prev[selectedStudentId], parentApprovalMode: 'flexi', emergencyAutoApprove: true }
                                 }));
-                                triggerToast('⚡ Mode Persetujuan Diubah ke Flexi Canteen Mode');
+                                triggerToast(currentMode === 'kampus' ? '⚡ Flexi Mode (Emergency Guard) Aktif' : '⚡ Flexi Canteen Mode Aktif');
                               }}
                               className={`p-2.5 rounded-xl border text-left space-y-1 transition-all ${
                                 student.parentApprovalMode !== 'strict'
@@ -1977,11 +1987,17 @@ export default function App() {
                               }`}
                             >
                               <div className="flex items-center justify-between">
-                                <span className="font-extrabold text-xs text-[#00897B]">Flexi Canteen Mode</span>
-                                <span className="text-[8px] bg-emerald-500 text-white font-bold px-1.5 py-0.5 rounded">Auto-Approve</span>
+                                <span className="font-extrabold text-xs text-[#00897B]">
+                                  {currentMode === 'kampus' ? 'Flexi Mode (Emergency Guard)' : 'Flexi Canteen Mode'}
+                                </span>
+                                <span className="text-[8px] bg-emerald-500 text-white font-bold px-1.5 py-0.5 rounded">
+                                  {currentMode === 'kampus' ? 'Emergency' : 'Auto-Approve'}
+                                </span>
                               </div>
                               <p className="text-[9px] text-slate-600 leading-tight">
-                                Menyetujui otomatis transaksi kantin hingga batas Emergency Overdraft (Max Rp15.000).
+                                {currentMode === 'kampus'
+                                  ? 'Izinkan otomatis potongan dari Saldo Utama jika pagu harian kurang di Kantin Kampus.'
+                                  : 'Menyetujui otomatis transaksi kantin hingga batas Emergency Overdraft (Max Rp15.000).'}
                               </p>
                             </button>
                           </div>
