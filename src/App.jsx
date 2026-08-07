@@ -37,7 +37,8 @@ import {
   Download,
   Share2,
   Users,
-  ChevronLeft
+  ChevronLeft,
+  Zap
 } from 'lucide-react';
 
 import { initialStudentsData } from './dummyData';
@@ -1080,16 +1081,16 @@ export default function App() {
 
                               <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar pt-0.5">
                                 <div className="px-2.5 py-1 bg-slate-50 border border-slate-200/80 rounded-xl text-[10px] font-bold text-slate-800 flex items-center gap-1.5 shrink-0">
-                                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-500"></span> GoPay / Gojek ⚡
+                                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-500"></span> GoPay ⚡
                                 </div>
                                 <div className="px-2.5 py-1 bg-slate-50 border border-slate-200/80 rounded-xl text-[10px] font-bold text-slate-800 flex items-center gap-1.5 shrink-0">
-                                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-500"></span> OVO / DANA / ShopeePay ⚡
+                                  <span className="w-1.5 h-1.5 rounded-full bg-orange-500"></span> ShopeePay ⚡
                                 </div>
                                 <div className="px-2.5 py-1 bg-slate-50 border border-slate-200/80 rounded-xl text-[10px] font-bold text-slate-800 flex items-center gap-1.5 shrink-0">
-                                  <span className="w-1.5 h-1.5 rounded-full bg-teal-500"></span> Tagihan Kos & Utilities
+                                  <span className="w-1.5 h-1.5 rounded-full bg-cyan-500"></span> KTM TapCash BNI
                                 </div>
                                 <div className="px-2.5 py-1 bg-slate-50 border border-slate-200/80 rounded-xl text-[10px] font-bold text-slate-800 flex items-center gap-1.5 shrink-0">
-                                  <span className="w-1.5 h-1.5 rounded-full bg-cyan-500"></span> BNI H2H TapCash
+                                  <span className="w-1.5 h-1.5 rounded-full bg-teal-500"></span> PLN Kos Auto-Debit
                                 </div>
                               </div>
                             </div>
@@ -1587,40 +1588,68 @@ export default function App() {
                         <div className="bg-slate-50 p-3.5 rounded-2xl border border-slate-200/80 space-y-2.5">
                           <p className="font-bold text-slate-800">Daftar Mitra Terhubung (BNI Direct Link):</p>
                           <div className="space-y-2">
-                            {/* Row 1: GoPay / Gojek */}
-                            <div className="p-2.5 rounded-xl bg-white border border-slate-200 flex items-center justify-between shadow-2xs">
-                              <div>
-                                <p className="font-bold text-slate-900">GoPay / Gojek ⚡</p>
-                                <p className="text-[10px] text-slate-500 font-medium">Untuk GoFood & Transportasi Kampus</p>
+                            {/* Baris 1: GoPay */}
+                            <div className="p-3 rounded-2xl bg-white border border-slate-200/80 flex items-center justify-between shadow-2xs">
+                              <div className="flex items-center gap-3">
+                                <div className="w-9 h-9 rounded-xl bg-emerald-100 text-emerald-700 flex items-center justify-center shrink-0">
+                                  <Smartphone className="w-4 h-4" />
+                                </div>
+                                <div>
+                                  <h4 className="font-extrabold text-slate-900 text-xs">GoPay</h4>
+                                  <p className="text-[10px] text-slate-500 font-medium">Direct Debit GoFood & Transportasi Kampus</p>
+                                </div>
                               </div>
-                              <span className="text-[10px] bg-emerald-100 text-emerald-700 font-bold px-2 py-0.5 rounded-full">Connected</span>
+                              <span className="text-[10px] bg-emerald-100 text-emerald-800 font-extrabold px-2.5 py-0.5 rounded-full border border-emerald-200">
+                                Connected
+                              </span>
                             </div>
 
-                            {/* Row 2: OVO / DANA / ShopeePay */}
-                            <div className="p-2.5 rounded-xl bg-white border border-slate-200 flex items-center justify-between shadow-2xs">
-                              <div>
-                                <p className="font-bold text-slate-900">OVO / DANA / ShopeePay ⚡</p>
-                                <p className="text-[10px] text-slate-500 font-medium">Untuk Quick Top-Up E-Wallet</p>
+                            {/* Baris 2: ShopeePay */}
+                            <div className="p-3 rounded-2xl bg-white border border-slate-200/80 flex items-center justify-between shadow-2xs">
+                              <div className="flex items-center gap-3">
+                                <div className="w-9 h-9 rounded-xl bg-orange-100 text-orange-700 flex items-center justify-center shrink-0">
+                                  <Wallet className="w-4 h-4" />
+                                </div>
+                                <div>
+                                  <h4 className="font-extrabold text-slate-900 text-xs">ShopeePay</h4>
+                                  <p className="text-[10px] text-slate-500 font-medium">Instant Top-Up & Payment Link</p>
+                                </div>
                               </div>
-                              <span className="text-[10px] bg-emerald-100 text-emerald-700 font-bold px-2 py-0.5 rounded-full">Connected</span>
+                              <span className="text-[10px] bg-emerald-100 text-emerald-800 font-extrabold px-2.5 py-0.5 rounded-full border border-emerald-200">
+                                Connected
+                              </span>
                             </div>
 
-                            {/* Row 3: Tagihan Kos & Utilities */}
-                            <div className="p-2.5 rounded-xl bg-white border border-slate-200 flex items-center justify-between shadow-2xs">
-                              <div>
-                                <p className="font-bold text-slate-900">Tagihan Kos & Utilities (PLN / Wi-Fi)</p>
-                                <p className="text-[10px] text-slate-500 font-medium">Untuk Pembayaran Rutin Bulanan</p>
+                            {/* Baris 3: KTM TapCash BNI */}
+                            <div className="p-3 rounded-2xl bg-white border border-slate-200/80 flex items-center justify-between shadow-2xs">
+                              <div className="flex items-center gap-3">
+                                <div className="w-9 h-9 rounded-xl bg-cyan-100 text-cyan-800 flex items-center justify-center shrink-0">
+                                  <CreditCard className="w-4 h-4" />
+                                </div>
+                                <div>
+                                  <h4 className="font-extrabold text-slate-900 text-xs">KTM TapCash BNI</h4>
+                                  <p className="text-[10px] text-slate-500 font-medium">Presensi, Parkir & Kantin Kampus</p>
+                                </div>
                               </div>
-                              <span className="text-[10px] bg-teal-100 text-teal-800 font-bold px-2 py-0.5 rounded-full">Aktif Auto-Debit</span>
+                              <span className="text-[10px] bg-cyan-100 text-cyan-800 font-extrabold px-2.5 py-0.5 rounded-full border border-cyan-200">
+                                Terhubung H2H
+                              </span>
                             </div>
 
-                            {/* Row 4: Merchant Kantin & KTM TapCash */}
-                            <div className="p-2.5 rounded-xl bg-white border border-slate-200 flex items-center justify-between shadow-2xs">
-                              <div>
-                                <p className="font-bold text-slate-900">Merchant Kantin & KTM TapCash</p>
-                                <p className="text-[10px] text-slate-500 font-medium">Untuk Transaksi TapCash / QRIS Harian</p>
+                            {/* Baris 4: Tagihan Listrik Kos (PLN) */}
+                            <div className="p-3 rounded-2xl bg-white border border-slate-200/80 flex items-center justify-between shadow-2xs">
+                              <div className="flex items-center gap-3">
+                                <div className="w-9 h-9 rounded-xl bg-teal-100 text-teal-800 flex items-center justify-center shrink-0">
+                                  <Zap className="w-4 h-4" />
+                                </div>
+                                <div>
+                                  <h4 className="font-extrabold text-slate-900 text-xs">Tagihan Listrik Kos (PLN)</h4>
+                                  <p className="text-[10px] text-slate-500 font-medium">Auto-Debit Rutin Setiap Tanggal 25</p>
+                                </div>
                               </div>
-                              <span className="text-[10px] bg-cyan-100 text-cyan-800 font-bold px-2 py-0.5 rounded-full">Terhubung BNI H2H</span>
+                              <span className="text-[10px] bg-teal-100 text-teal-800 font-extrabold px-2.5 py-0.5 rounded-full border border-teal-200">
+                                Auto-Debit Aktif
+                              </span>
                             </div>
                           </div>
                         </div>
