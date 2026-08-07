@@ -308,14 +308,14 @@ export default function SchoolTreasury({ currentMode = 'sekolah', onTriggerNotif
             <table className="w-full text-left border-collapse text-xs">
               <thead>
                 <tr className="bg-slate-50 border-b border-slate-200 text-slate-500 font-bold text-xs uppercase tracking-wider">
-                  <th className="py-3 px-4">{currentMode === 'kampus' ? 'NIM' : 'NIS'}</th>
-                  <th className="py-3 px-4">{currentMode === 'kampus' ? 'Nama Mahasiswa' : 'Nama Siswa'}</th>
-                  <th className="py-3 px-4">{currentMode === 'kampus' ? 'Prodi / Kelas' : 'Kelas'}</th>
-                  <th className="py-3 px-4">{currentMode === 'kampus' ? 'Fakultas / Wali' : 'Nama Orang Tua'}</th>
-                  <th className="py-3 px-4">{currentMode === 'kampus' ? 'Nominal UKT' : 'Nominal SPP'}</th>
-                  <th className="py-3 px-4">{currentMode === 'kampus' ? 'Status UKT' : 'Status SPP'}</th>
-                  <th className="py-3 px-4">Metode & Tanggal</th>
-                  <th className="py-3 px-4 text-right">Aksi Portal</th>
+                  <th className="py-3 px-4 whitespace-nowrap">{currentMode === 'kampus' ? 'NIM' : 'NIS'}</th>
+                  <th className="py-3 px-4 whitespace-nowrap">{currentMode === 'kampus' ? 'Nama Mahasiswa' : 'Nama Siswa'}</th>
+                  <th className="py-3 px-4 whitespace-nowrap min-w-[130px]">{currentMode === 'kampus' ? 'Prodi / Kelas' : 'Kelas'}</th>
+                  <th className="py-3 px-4 whitespace-nowrap">{currentMode === 'kampus' ? 'Fakultas / Wali' : 'Nama Orang Tua'}</th>
+                  <th className="py-3 px-4 whitespace-nowrap">{currentMode === 'kampus' ? 'Nominal UKT' : 'Nominal SPP'}</th>
+                  <th className="py-3 px-4 whitespace-nowrap">{currentMode === 'kampus' ? 'Status UKT' : 'Status SPP'}</th>
+                  <th className="py-3 px-4 whitespace-nowrap">Metode & Tanggal</th>
+                  <th className="py-3 px-4 text-right whitespace-nowrap">Aksi Portal</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100 font-medium">
@@ -323,12 +323,12 @@ export default function SchoolTreasury({ currentMode = 'sekolah', onTriggerNotif
                   <tr key={std.id} className="hover:bg-slate-50/80 transition-colors">
                     
                     {/* NIM / NIS */}
-                    <td className="py-3.5 px-4 font-mono text-slate-500 font-semibold">
+                    <td className="py-3.5 px-4 font-mono text-slate-500 font-semibold whitespace-nowrap">
                       {currentMode === 'kampus' ? (std.id === 'std-1' ? '18239012' : `182390${std.nis.slice(-2)}`) : std.nis}
                     </td>
 
                     {/* Student Name & Avatar */}
-                    <td className="py-3.5 px-4">
+                    <td className="py-3.5 px-4 whitespace-nowrap">
                       <div className="flex items-center gap-3">
                         <img src={std.avatar} alt={std.name} className="w-8 h-8 rounded-full object-cover border border-slate-200" />
                         <span className="font-bold text-slate-900">{std.name}</span>
@@ -336,8 +336,8 @@ export default function SchoolTreasury({ currentMode = 'sekolah', onTriggerNotif
                     </td>
 
                     {/* Prodi / Class */}
-                    <td className="py-3.5 px-4">
-                      <span className="bg-slate-100 text-slate-700 text-[11px] font-bold px-2.5 py-1 rounded-full border border-slate-200">
+                    <td className="py-3.5 px-4 whitespace-nowrap min-w-[130px]">
+                      <span className="bg-slate-100 text-slate-700 text-[11px] font-bold px-2.5 py-1 rounded-full border border-slate-200 whitespace-nowrap inline-block">
                         {currentMode === 'kampus'
                           ? (std.className.includes('IPA 2') ? 'Sistem Informasi' : std.className.includes('IPS') ? 'Manajemen' : 'Kedokteran Gigi')
                           : std.className}
