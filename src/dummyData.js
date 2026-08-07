@@ -22,8 +22,8 @@ export const initialStudentsData = {
   aisha: {
     id: 'aisha',
     name: 'Aisha Putri',
-    school: 'SMP 2 Surabaya',
-    grade: 'Kelas 8 B',
+    school: 'SMA 1 Surabaya',
+    grade: 'Kelas 10 IPA 1',
     nis: '2025.08.0128',
     cardNo: 'BNI Junior •••• 7120',
     avatar: 'https://i.pravatar.cc/150?img=49',
@@ -101,7 +101,7 @@ export const initialTreasuryStudents = [
     nis: '2024.11.0492',
     name: 'Akbar Putra',
     className: 'Kelas 11 IPA 2',
-    parentName: 'Karnisa',
+    parentName: 'Ibu Karnisa',
     sppAmount: 1200000,
     status: 'LUNAS',
     paymentMethod: 'Autodebit wondr',
@@ -154,8 +154,8 @@ export const initialTreasuryStudents = [
     id: 'std-5',
     nis: '2025.08.0128',
     name: 'Aisha Putri',
-    className: 'Kelas 8 B',
-    parentName: 'Karnisa',
+    className: 'Kelas 10 IPA 1',
+    parentName: 'Ibu Karnisa',
     sppAmount: 1200000,
     status: 'LUNAS',
     paymentMethod: 'Autodebit wondr',
@@ -179,8 +179,8 @@ export const initialTreasuryStudents = [
 ];
 
 export const treasuryMetrics = {
-  totalTargetAmount: 1576000000,
-  initialCollectedAmount: 1450000000,
+  totalTargetAmount: 1440000000,
+  initialCollectedAmount: 1324800000,
   totalStudents: 1200,
   initialPaidStudents: 1104,
   badDebtRate: '8%',

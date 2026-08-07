@@ -34,7 +34,7 @@ export default function SchoolTreasury({ currentMode = 'sekolah', onTriggerNotif
 
   const totalCollectedAmount = students.reduce((acc, curr) => {
     return curr.status === 'LUNAS' ? acc + curr.sppAmount : acc;
-  }, treasuryMetrics.initialCollectedAmount - (3 * 1200000));
+  }, treasuryMetrics.initialCollectedAmount - (4 * 1200000));
 
   const collectionPercentage = Math.round((totalCollectedAmount / treasuryMetrics.totalTargetAmount) * 100);
 
@@ -284,11 +284,21 @@ export default function SchoolTreasury({ currentMode = 'sekolah', onTriggerNotif
                 onChange={(e) => setSelectedClass(e.target.value)}
                 className="bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs font-bold text-slate-700 focus:outline-none focus:border-[#00A396]"
               >
-                <option value="ALL">Semua Fakultas/Prodi</option>
-                <option value="Kelas 11 IPA 2">FST / Sistem Informasi</option>
-                <option value="Kelas 11 IPS 1">FEB / Manajemen</option>
-                <option value="Kelas 11 IPA 1">FK / Kedokteran Gigi</option>
-                <option value="Kelas 8 B">FH / Hukum</option>
+                <option value="ALL">
+                  {currentMode === 'kampus' ? 'Semua Fakultas/Prodi' : 'Semua Kelas / Jurusan'}
+                </option>
+                <option value="Kelas 11 IPA 2">
+                  {currentMode === 'kampus' ? 'FST / Sistem Informasi' : 'Kelas 11 IPA 2'}
+                </option>
+                <option value="Kelas 11 IPS 1">
+                  {currentMode === 'kampus' ? 'FEB / Manajemen' : 'Kelas 11 IPS 1'}
+                </option>
+                <option value="Kelas 11 IPA 1">
+                  {currentMode === 'kampus' ? 'FK / Kedokteran Gigi' : 'Kelas 11 IPA 1'}
+                </option>
+                <option value="Kelas 10 IPA 1">
+                  {currentMode === 'kampus' ? 'FH / Hukum' : 'Kelas 10 IPA 1'}
+                </option>
               </select>
             </div>
           </div>
