@@ -859,7 +859,7 @@ export default function App() {
                                     <div className="w-10 h-10 rounded-xl bg-cyan-100 text-cyan-800 flex items-center justify-center shadow-xs">
                                       <Link2 className="w-5 h-5" />
                                     </div>
-                                    <span className="text-[11px] font-bold text-slate-800 text-center leading-tight">E-Wallet Link</span>
+                                    <span className="text-[11px] font-bold text-slate-800 text-center leading-tight">E-Wallet & Debit</span>
                                   </button>
 
                                   {/* Icon 6: Budgeting / Pagu */}
@@ -1069,24 +1069,27 @@ export default function App() {
                               </div>
                             </div>
 
-                            {/* Connected E-Commerce */}
+                            {/* Connected E-Wallet & Direct Debit */}
                             <div className="bg-white p-3.5 rounded-2xl border border-slate-200/80 shadow-xs space-y-2">
                               <div className="flex items-center justify-between">
                                 <h3 className="font-semibold text-slate-900 text-xs flex items-center gap-1.5">
-                                  <Link2 className="w-3.5 h-3.5 text-[#00A396]" /> Connected E-Commerce (Direct Pay)
+                                  <Link2 className="w-3.5 h-3.5 text-[#00A396]" /> Connected E-Wallet & Direct Debit
                                 </h3>
                                 <span className="text-[9px] font-extrabold text-teal-700 bg-teal-50 px-2 py-0.5 rounded-full">Pilar 2 Direct Link</span>
                               </div>
 
                               <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar pt-0.5">
                                 <div className="px-2.5 py-1 bg-slate-50 border border-slate-200/80 rounded-xl text-[10px] font-bold text-slate-800 flex items-center gap-1.5 shrink-0">
-                                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-500"></span> Gojek / GoPay ⚡
+                                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-500"></span> GoPay / Gojek ⚡
                                 </div>
                                 <div className="px-2.5 py-1 bg-slate-50 border border-slate-200/80 rounded-xl text-[10px] font-bold text-slate-800 flex items-center gap-1.5 shrink-0">
-                                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-500"></span> Tokopedia / Shopee ⚡
+                                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-500"></span> OVO / DANA / ShopeePay ⚡
                                 </div>
                                 <div className="px-2.5 py-1 bg-slate-50 border border-slate-200/80 rounded-xl text-[10px] font-bold text-slate-800 flex items-center gap-1.5 shrink-0">
-                                  <span className="w-1.5 h-1.5 rounded-full bg-teal-500"></span> PLN Auto-Debit
+                                  <span className="w-1.5 h-1.5 rounded-full bg-teal-500"></span> Tagihan Kos & Utilities
+                                </div>
+                                <div className="px-2.5 py-1 bg-slate-50 border border-slate-200/80 rounded-xl text-[10px] font-bold text-slate-800 flex items-center gap-1.5 shrink-0">
+                                  <span className="w-1.5 h-1.5 rounded-full bg-cyan-500"></span> BNI H2H TapCash
                                 </div>
                               </div>
                             </div>
@@ -1461,10 +1464,14 @@ export default function App() {
                             {activeCampusSheet === 'ormawa' && 'Kas Komunitas Ormawa'}
                             {activeCampusSheet === 'tapcash' && 'Top Up KTM TapCash BNI'}
                             {activeCampusSheet === 'splitbill' && 'Split Bill Nongkrong'}
-                            {activeCampusSheet === 'ewallet' && 'Connected E-Commerce Direct Link'}
+                            {activeCampusSheet === 'ewallet' && 'Connected E-Wallet & Direct Debit'}
                             {activeCampusSheet === 'budgeting' && 'Pagu Mandiri & Monthly Budgeting'}
                           </h3>
-                          <p className="text-[10px] text-slate-500 font-semibold">Layanan Keuangan Edukasi BNI Open API</p>
+                          <p className="text-[10px] text-slate-500 font-semibold">
+                            {activeCampusSheet === 'ewallet'
+                              ? 'Kelola Hubungan BNI Open API & Instant Auto-Debit'
+                              : 'Layanan Keuangan Edukasi BNI Open API'}
+                          </p>
                         </div>
                       </div>
                       <button onClick={() => setActiveCampusSheet(null)} className="p-1 text-slate-400 hover:text-slate-600">
@@ -1577,26 +1584,49 @@ export default function App() {
 
                     {activeCampusSheet === 'ewallet' && (
                       <div className="space-y-3 text-xs">
-                        <div className="bg-slate-50 p-3.5 rounded-2xl border border-slate-200/80 space-y-2">
-                          <p className="font-bold text-slate-800">Direct Link E-Wallet Connected:</p>
-                          <div className="space-y-1.5">
-                            <div className="p-2 rounded-xl bg-white border border-slate-200 flex justify-between items-center">
-                              <span className="font-bold text-slate-800">Gojek / GoPay ⚡</span>
+                        <div className="bg-slate-50 p-3.5 rounded-2xl border border-slate-200/80 space-y-2.5">
+                          <p className="font-bold text-slate-800">Daftar Mitra Terhubung (BNI Direct Link):</p>
+                          <div className="space-y-2">
+                            {/* Row 1: GoPay / Gojek */}
+                            <div className="p-2.5 rounded-xl bg-white border border-slate-200 flex items-center justify-between shadow-2xs">
+                              <div>
+                                <p className="font-bold text-slate-900">GoPay / Gojek ⚡</p>
+                                <p className="text-[10px] text-slate-500 font-medium">Untuk GoFood & Transportasi Kampus</p>
+                              </div>
                               <span className="text-[10px] bg-emerald-100 text-emerald-700 font-bold px-2 py-0.5 rounded-full">Connected</span>
                             </div>
-                            <div className="p-2 rounded-xl bg-white border border-slate-200 flex justify-between items-center">
-                              <span className="font-bold text-slate-800">Tokopedia / Shopee ⚡</span>
+
+                            {/* Row 2: OVO / DANA / ShopeePay */}
+                            <div className="p-2.5 rounded-xl bg-white border border-slate-200 flex items-center justify-between shadow-2xs">
+                              <div>
+                                <p className="font-bold text-slate-900">OVO / DANA / ShopeePay ⚡</p>
+                                <p className="text-[10px] text-slate-500 font-medium">Untuk Quick Top-Up E-Wallet</p>
+                              </div>
                               <span className="text-[10px] bg-emerald-100 text-emerald-700 font-bold px-2 py-0.5 rounded-full">Connected</span>
                             </div>
-                            <div className="p-2 rounded-xl bg-white border border-slate-200 flex justify-between items-center">
-                              <span className="font-bold text-slate-800">PLN Auto-Debit</span>
-                              <span className="text-[10px] bg-teal-100 text-teal-800 font-bold px-2 py-0.5 rounded-full">Aktif</span>
+
+                            {/* Row 3: Tagihan Kos & Utilities */}
+                            <div className="p-2.5 rounded-xl bg-white border border-slate-200 flex items-center justify-between shadow-2xs">
+                              <div>
+                                <p className="font-bold text-slate-900">Tagihan Kos & Utilities (PLN / Wi-Fi)</p>
+                                <p className="text-[10px] text-slate-500 font-medium">Untuk Pembayaran Rutin Bulanan</p>
+                              </div>
+                              <span className="text-[10px] bg-teal-100 text-teal-800 font-bold px-2 py-0.5 rounded-full">Aktif Auto-Debit</span>
+                            </div>
+
+                            {/* Row 4: Merchant Kantin & KTM TapCash */}
+                            <div className="p-2.5 rounded-xl bg-white border border-slate-200 flex items-center justify-between shadow-2xs">
+                              <div>
+                                <p className="font-bold text-slate-900">Merchant Kantin & KTM TapCash</p>
+                                <p className="text-[10px] text-slate-500 font-medium">Untuk Transaksi TapCash / QRIS Harian</p>
+                              </div>
+                              <span className="text-[10px] bg-cyan-100 text-cyan-800 font-bold px-2 py-0.5 rounded-full">Terhubung BNI H2H</span>
                             </div>
                           </div>
                         </div>
                         <button
                           onClick={() => {
-                            triggerToast('🔗 Pengaturan Direct Link E-Wallet Diperbarui');
+                            triggerToast('🔗 Pengaturan Direct Link E-Wallet & Direct Debit Diperbarui');
                             setActiveCampusSheet(null);
                           }}
                           className="w-full bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs py-2.5 rounded-xl"
